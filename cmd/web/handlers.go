@@ -4,23 +4,35 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"log"
+	"html/template"
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
-	// sprawdzamy czy path to dokładnie "/". 
-	// inaczej rzucamy 404
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
 	}
-	w.Write([]byte("Cześć."))
+
+	files := []string{"./ui/html/pages/home.html", "./ui/html/base.html", "./ui/html/partials/nav.html"}
+
+
+	templateset, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Wewnętrzny błąd serwera", http.StatusInternalServerError)
+		return
+	}
+	
+	err = templateset.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Wewnętrzny błąd serwera", http.StatusInternalServerError)
+	}
 }
 
 func jpkAddInvoice(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		// WriteHeader można zawołać tylko raz na odpowiedź
-		// jeśli nie wywołamy w.WriteHeader() to w.Write
-		// automatycznie zwróci 200 OK
 		w.Header().Set("Allow", http.MethodPost)
 		http.Error(w, "Metoda nieakceptowana", http.StatusMethodNotAllowed)
 		return
