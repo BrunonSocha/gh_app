@@ -1,0 +1,31 @@
+package models
+
+import (
+	"database/sql"
+	"time"
+)
+
+type Invoice struct {
+	id int
+	nr_faktury string
+	nip int
+	netto float64
+	podatek float64
+	data time.Time
+}
+
+type InvoiceModel struct {
+	DB *sql.DB
+}
+
+func (m *InvoiceModel) Insert(nr_faktury string, nip int, netto float64, podatek float64, data time.Time) (int, error) {
+	return 0, nil
+}
+
+func (m *InvoiceModel) Get(id int) (*Invoice, error) {
+	return nil, nil
+}
+
+func (m *InvoiceModel) ThisMonth() ([]*Invoice, error) {
+	return nil, nil
+}

@@ -1,0 +1,47 @@
+{{define "title"}}Faktura #{{.Invoice.Id}}{{end}}
+
+{{define "main"}}
+    {{with .Invoice}}
+    <div class='invoice'>
+        <div class='metadata'>
+            <span class="inv-type">{{.Inv_type}}</span>
+        <strong>{{.Nr_faktury}}</strong>
+            <span class="inv-id">#{{.Id}}</span>
+        </div>
+
+        <div class="values-section">
+            <div class="dotted-row">
+                <span class="label">Netto</span>
+                <span class="dots"></span>
+                <span class="value val-netto">{{.Netto}}</span>
+            </div>
+            <div class="dotted-row">
+                <span class="label">Podatek</span>
+                <span class="dots"></span>
+                <span class="value val-podatek">{{.Podatek}}</span>
+            </div>
+            <div class="dotted-row brutto-row">
+                <span class="label">Brutto</span>
+                <span class="dots"></span>
+                <span class="value val-brutto"></span>
+            </div>
+        </div>
+
+        <div class='metadata bottom-meta'>
+            <div class="date-box">
+                <span class="date-label">Data:</span>
+                <span class="date-value">{{.Data.Format "02-01-2006"}}</span>
+            </div>
+            <div class="company-box">
+                {{$.CompanyName}}
+            </div>
+            <div class="nip-box">
+                <span class="nip-label">NIP:</span>
+                <span class="nip-value">{{.Nip}}</span>
+            </div>
+        </div>
+    </div>
+
+    <script src='/static/js/invoice.js' type='text/javascript'></script>
+    {{end}}
+{{end}}

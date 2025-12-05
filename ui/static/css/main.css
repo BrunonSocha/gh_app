@@ -1,0 +1,272 @@
+:root {
+    --color-black: #000000;
+    --color-white: #ffffff;
+    --color-magenta: #e91e63;
+    --color-seledyn: #00ffaa;
+    --color-bg-grey: #F1F3F6;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-padding-top: 165px;
+    height: 100%;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.5;
+    background-color: var(--color-bg-grey);
+    color: var(--color-black);
+    height: 100%;
+    overflow-y: scroll;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-black);
+    text-transform: uppercase;
+}
+
+a {
+    color: var(--color-black);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--color-magenta);
+}
+
+header {
+    background-color: var(--color-white);
+    border-bottom: 4px solid var(--color-black);
+    padding: 1.5rem 0;
+    text-align: center;
+}
+
+h1 a {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    padding-left: 0;
+    background: none;
+}
+
+nav {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem calc((100% - 66rem) / 2);
+    background: var(--color-white);
+    font-weight: 500;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    margin-right: 1.5rem;
+    font-size: 0.9rem;
+}
+
+nav a.live {
+    font-weight: 900;
+    border-bottom: 2px solid var(--color-magenta);
+}
+
+main {
+    margin: 3rem auto;
+    max-width: 66rem;
+    min-height: calc(100vh - 300px);
+    padding: 0 1rem;
+}
+
+/* --- INVOICE STYLES --- */
+
+.invoice {
+    background: var(--color-white);
+    padding: 2rem;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Top Metadata (Type, Invoice #, ID) */
+.invoice .metadata {
+    border-top: 4px solid var(--color-black);
+    padding-top: 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: baseline;
+    font-size: 1rem;
+}
+
+/* Bottom Metadata (Date, NIP) */
+.invoice .metadata.bottom-meta {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Alignment Helpers */
+.invoice .metadata strong,
+.invoice .metadata > :last-child {
+    text-align: right;
+}
+
+.invoice .metadata > :nth-child(2) {
+    text-align: center;
+}
+
+/* --- WEIGHTS & COLORS --- */
+
+/* Labels: Bold (Data:, NIP:) */
+.nip-label, 
+.date-label {
+    font-weight: 700;
+}
+
+/* Values: Normal (2025-..., 123456...) */
+.nip-value, 
+.date-value {
+    font-weight: 400; 
+}
+
+/* Top Row items */
+.invoice .metadata .inv-id,
+.invoice .metadata .inv-type {
+    font-weight: 700;
+}
+
+.inv-type {
+    color: var(--color-black);
+    text-transform: uppercase;
+}
+
+.inv-id {
+    color: var(--color-black);
+}
+
+/* --- VALUES SECTION (Netto/Podatek/Brutto) --- */
+
+.values-section {
+    border-top: 4px solid var(--color-black);
+    padding-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.dotted-row {
+    display: flex;
+    align-items: baseline;
+    width: 100%;
+}
+
+.dotted-row .label {
+    flex-shrink: 0;
+    font-weight: 400; 
+}
+
+.dotted-row .dots {
+    flex-grow: 1;
+    border-bottom: 2px dotted var(--color-black);
+    margin: 0 8px;
+    position: relative;
+    top: -4px;
+}
+
+.dotted-row .value {
+    flex-shrink: 0;
+    font-weight: 400;
+    text-align: right;
+}
+
+.brutto-row {
+    margin-top: 0.5rem;
+    font-weight: 700;
+}
+
+.brutto-row .label, 
+.brutto-row .value {
+    font-weight: 700;
+}
+
+.bottom-meta {
+    margin-top: auto;
+}
+
+/* --- FORM & GLOBAL --- */
+
+form input[type="text"], 
+form input[type="password"], 
+form input[type="email"], 
+textarea {
+    font-family: 'Roboto', sans-serif;
+    color: var(--color-black);
+    background: var(--color-white);
+    border: 2px solid #E4E5E7;
+    border-radius: 0;
+    padding: 0.75rem;
+    width: 100%;
+}
+
+form input:focus, textarea:focus {
+    border-color: var(--color-black);
+    outline: none;
+}
+
+a.button, input[type="submit"] {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border: none;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+a.button:hover, input[type="submit"]:hover {
+    background-color: var(--color-magenta);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-top: 4px solid var(--color-black);
+    padding-top: 0.25rem;
+}
+
+footer {
+    border-top: 4px solid var(--color-black);
+    padding: 2rem 0;
+    background: var(--color-bg-grey);
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.company-box {
+    font-weight: 400; 
+    text-align: center;
+}

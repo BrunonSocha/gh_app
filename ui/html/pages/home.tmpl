@@ -1,0 +1,29 @@
+{{define "title"}}Panel{{end}}
+
+{{define "main"}}
+    <h2>Faktury w tym miesiącu</h2>
+    {{if .Invoices}}
+    <table>
+        <tr>
+            <th>Nr Faktury</th>
+            <th>NIP</th>
+            <th>Netto</th>
+            <th>Podatek</th>
+            <th>Data</th>
+            <th>Typ</th>
+        </tr>
+        {{range .Invoices}}
+        <tr>
+            <td><a href='/viewinvoice?id={{.Id}}'>{{.Nr_faktury}}</a></td>
+            <td>{{.Nip}}</td>
+            <td>{{.Netto}}</td>
+            <td>{{.Podatek}}</td>
+            <td>{{.Data.Format "02-01-2006"}}</td>
+            <td>{{.Inv_type}}</td>
+        </tr>
+        {{end}}
+    </table>
+    {{else}}
+        <p>Nie ma jeszcze faktur z tego miesiąca.</p>
+    {{end}}
+{{end}}

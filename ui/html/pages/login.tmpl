@@ -1,0 +1,13 @@
+{{define "title"}}Logowanie{{end}}
+
+{{define "main"}}
+    <form action="/login" method="POST">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" placeholder="Nazwa użytkownika" type="text">
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="password" placeholder="Hasło" type="text">
+        </div>
+        <button class="btn btn-primary" type="submit">Zaloguj się</button>
+    </form>
+{{end}}

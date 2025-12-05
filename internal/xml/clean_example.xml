@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<JPK xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://crd.gov.pl/wzor/2021/12/27/11148/">
+  <Naglowek>
+    <KodFormularza kodSystemowy="JPK_V7M (2)" wersjaSchemy="1-0E">JPK_VAT</KodFormularza>
+    <WariantFormularza>2</WariantFormularza>
+    <DataWytworzeniaJPK>2025-10-03T11:13:08.9533354+02:00</DataWytworzeniaJPK>
+    <NazwaSystemu>Formularz uproszczony</NazwaSystemu>
+    <CelZlozenia poz="P_7">2</CelZlozenia>
+    <KodUrzedu></KodUrzedu>
+    <Rok></Rok>
+    <Miesiac></Miesiac>
+  </Naglowek>
+  <Podmiot1 rola="Podatnik">
+    <OsobaNiefizyczna>
+      <NIP></NIP>
+      <PelnaNazwa></PelnaNazwa>
+      <Email></Email>
+      <Telefon></Telefon>
+    </OsobaNiefizyczna>
+  </Podmiot1>
+  <Deklaracja>
+    <Naglowek>
+      <KodFormularzaDekl kodSystemowy="VAT-7 (22)" kodPodatku="VAT" rodzajZobowiazania="Z" wersjaSchemy="1-0E">VAT-7</KodFormularzaDekl>
+      <WariantFormularzaDekl>22</WariantFormularzaDekl>
+    </Naglowek>
+    <PozycjeSzczegolowe>
+      <P_37>0</P_37>
+      <P_38>0</P_38>
+      <P_39>0</P_39>
+      <P_42>0</P_42>
+      <P_43>0</P_43>
+      <P_48>0</P_48>
+      <P_51>0</P_51>
+      <P_53>0</P_53>
+      <P_62>0</P_62>
+      <P_68>0</P_68>
+      <P_69>0</P_69>
+    </PozycjeSzczegolowe>
+    <Pouczenia>1</Pouczenia>
+  </Deklaracja>
+  <Ewidencja>
+    <SprzedazCtrl>
+      <LiczbaWierszySprzedazy>0</LiczbaWierszySprzedazy>
+      <PodatekNalezny>0</PodatekNalezny>
+    </SprzedazCtrl>
+    <ZakupWiersz>
+      <LpZakupu>1</LpZakupu>
+      <KodKrajuNadaniaTIN>PL</KodKrajuNadaniaTIN>
+      <NrDostawcy>6762646904</NrDostawcy>
+      <NazwaDostawcy>STANET S.C.</NazwaDostawcy>
+      <DowodZakupu>88/8/2025</DowodZakupu>
+      <DataZakupu>2025-08-05</DataZakupu>
+      <K_42>118</K_42>
+      <K_43>27.14</K_43>
+    </ZakupWiersz>
+    <ZakupWiersz>
+      <LpZakupu>2</LpZakupu>
+      <KodKrajuNadaniaTIN>PL</KodKrajuNadaniaTIN>
+      <NrDostawcy>5260250995</NrDostawcy>
+      <NazwaDostawcy>Orange Polska S.A.</NazwaDostawcy>
+      <DowodZakupu>25080472334420</DowodZakupu>
+      <DataZakupu>2025-08-06</DataZakupu>
+      <K_42>86</K_42>
+      <K_43>19.78</K_43>
+    </ZakupWiersz>
+    <ZakupWiersz>
+      <LpZakupu>3</LpZakupu>
+      <KodKrajuNadaniaTIN>PL</KodKrajuNadaniaTIN>
+      <NrDostawcy>5261040567</NrDostawcy>
+      <NazwaDostawcy>T-Mobile Polska S.A.</NazwaDostawcy>
+      <DowodZakupu>502098610825</DowodZakupu>
+      <DataZakupu>2025-08-02</DataZakupu>
+      <K_42>312.75</K_42>
+      <K_43>71.93</K_43>
+    </ZakupWiersz>
+    <ZakupWiersz>
+      <LpZakupu>4</LpZakupu>
+      <KodKrajuNadaniaTIN>DE</KodKrajuNadaniaTIN>
+      <NrDostawcy>253564707</NrDostawcy>
+      <NazwaDostawcy>HEINRICH KIPP WERK GmbH &amp; Co. KG</NazwaDostawcy>
+      <DowodZakupu>2081437086</DowodZakupu>
+      <DataZakupu>2025-08-04</DataZakupu>
+      <K_42>87.12</K_42>
+      <K_43>16.55</K_43>
+    </ZakupWiersz>
+    <ZakupWiersz>
+      <LpZakupu>5</LpZakupu>
+      <KodKrajuNadaniaTIN>PL</KodKrajuNadaniaTIN>
+      <NrDostawcy>6811646791</NrDostawcy>
+      <NazwaDostawcy>Marrob Woś, Nowak Sp. jawna</NazwaDostawcy>
+      <DowodZakupu>FA/18074/2025/P</DowodZakupu>
+      <DataZakupu>2025-08-05</DataZakupu>
+      <K_42>62.76</K_42>
+      <K_43>14.43</K_43>
+    </ZakupWiersz>
+    <ZakupWiersz>
+      <LpZakupu>6</LpZakupu>
+      <KodKrajuNadaniaTIN>PL</KodKrajuNadaniaTIN>
+      <NrDostawcy>1180642343</NrDostawcy>
+      <NazwaDostawcy>TEZOJA WOJCIECH MAàASZEK</NazwaDostawcy>
+      <DowodZakupu>25-FVS/6499</DowodZakupu>
+      <DataZakupu>2025-08-04</DataZakupu>
+      <K_42>1477.24</K_42>
+      <K_43>339.76</K_43>
+    </ZakupWiersz>
+    <ZakupCtrl>
+      <LiczbaWierszyZakupow>6</LiczbaWierszyZakupow>
+      <PodatekNaliczony>489.59</PodatekNaliczony>
+    </ZakupCtrl>
+  </Ewidencja>
+</JPK>
