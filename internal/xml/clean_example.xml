@@ -43,69 +43,9 @@
       <LiczbaWierszySprzedazy>0</LiczbaWierszySprzedazy>
       <PodatekNalezny>0</PodatekNalezny>
     </SprzedazCtrl>
-    <ZakupWiersz>
-      <LpZakupu>1</LpZakupu>
-      <KodKrajuNadaniaTIN>PL</KodKrajuNadaniaTIN>
-      <NrDostawcy>6762646904</NrDostawcy>
-      <NazwaDostawcy>STANET S.C.</NazwaDostawcy>
-      <DowodZakupu>88/8/2025</DowodZakupu>
-      <DataZakupu>2025-08-05</DataZakupu>
-      <K_42>118</K_42>
-      <K_43>27.14</K_43>
-    </ZakupWiersz>
-    <ZakupWiersz>
-      <LpZakupu>2</LpZakupu>
-      <KodKrajuNadaniaTIN>PL</KodKrajuNadaniaTIN>
-      <NrDostawcy>5260250995</NrDostawcy>
-      <NazwaDostawcy>Orange Polska S.A.</NazwaDostawcy>
-      <DowodZakupu>25080472334420</DowodZakupu>
-      <DataZakupu>2025-08-06</DataZakupu>
-      <K_42>86</K_42>
-      <K_43>19.78</K_43>
-    </ZakupWiersz>
-    <ZakupWiersz>
-      <LpZakupu>3</LpZakupu>
-      <KodKrajuNadaniaTIN>PL</KodKrajuNadaniaTIN>
-      <NrDostawcy>5261040567</NrDostawcy>
-      <NazwaDostawcy>T-Mobile Polska S.A.</NazwaDostawcy>
-      <DowodZakupu>502098610825</DowodZakupu>
-      <DataZakupu>2025-08-02</DataZakupu>
-      <K_42>312.75</K_42>
-      <K_43>71.93</K_43>
-    </ZakupWiersz>
-    <ZakupWiersz>
-      <LpZakupu>4</LpZakupu>
-      <KodKrajuNadaniaTIN>DE</KodKrajuNadaniaTIN>
-      <NrDostawcy>253564707</NrDostawcy>
-      <NazwaDostawcy>HEINRICH KIPP WERK GmbH &amp; Co. KG</NazwaDostawcy>
-      <DowodZakupu>2081437086</DowodZakupu>
-      <DataZakupu>2025-08-04</DataZakupu>
-      <K_42>87.12</K_42>
-      <K_43>16.55</K_43>
-    </ZakupWiersz>
-    <ZakupWiersz>
-      <LpZakupu>5</LpZakupu>
-      <KodKrajuNadaniaTIN>PL</KodKrajuNadaniaTIN>
-      <NrDostawcy>6811646791</NrDostawcy>
-      <NazwaDostawcy>Marrob Woś, Nowak Sp. jawna</NazwaDostawcy>
-      <DowodZakupu>FA/18074/2025/P</DowodZakupu>
-      <DataZakupu>2025-08-05</DataZakupu>
-      <K_42>62.76</K_42>
-      <K_43>14.43</K_43>
-    </ZakupWiersz>
-    <ZakupWiersz>
-      <LpZakupu>6</LpZakupu>
-      <KodKrajuNadaniaTIN>PL</KodKrajuNadaniaTIN>
-      <NrDostawcy>1180642343</NrDostawcy>
-      <NazwaDostawcy>TEZOJA WOJCIECH MAàASZEK</NazwaDostawcy>
-      <DowodZakupu>25-FVS/6499</DowodZakupu>
-      <DataZakupu>2025-08-04</DataZakupu>
-      <K_42>1477.24</K_42>
-      <K_43>339.76</K_43>
-    </ZakupWiersz>
     <ZakupCtrl>
-      <LiczbaWierszyZakupow>6</LiczbaWierszyZakupow>
-      <PodatekNaliczony>489.59</PodatekNaliczony>
+      <LiczbaWierszyZakupow></LiczbaWierszyZakupow>
+      <PodatekNaliczony></PodatekNaliczony>
     </ZakupCtrl>
   </Ewidencja>
 </JPK>

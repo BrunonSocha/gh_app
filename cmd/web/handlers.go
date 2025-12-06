@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 	"time"
@@ -22,23 +21,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-
-	files := []string{"ui/html/pages/home.tmpl", "ui/html/base.tmpl", "ui/html/partials/nav.tmpl"}
-
-
-	templateset, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	tData := &templateData{
-		Invoices: invoices,
-	}
-
-	err = templateset.ExecuteTemplate(w, "base", tData)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	
+	app.render(w, http.StatusOK, "home.tmpl", &templateData{Invoices: invoices})
 }
 
 func (app *application) addInvoice(w http.ResponseWriter, r *http.Request) {
@@ -87,28 +71,7 @@ func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/partials/nav.tmpl",
-		"./ui/html/pages/view.tmpl",
-	}
-	
-	templateset, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	tData := &templateData{
-		Invoice: inv,
-		CompanyName: cname,
-	}
-
-	err = templateset.ExecuteTemplate(w, "base", tData)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
+	app.render(w, http.StatusOK, "view.tmpl", &templateData{Invoice: inv, CompanyName: cname})
 }
 
 func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {

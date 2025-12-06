@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+
 	"app.greyhouse.es/internal/models"
 	_ "github.com/microsoft/go-mssqldb"
 )
@@ -18,6 +20,7 @@ type application struct {
 	infoLog *log.Logger
 	invoices *models.InvoiceModel
 	invTypes *models.InvoiceType
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -37,15 +40,19 @@ func main() {
 	}
 	defer db.Close()
 
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
 	// application struct instance
 	app := &application{
 		errorLog: errorLog,
 		infoLog: infoLog,
 		invoices: &models.InvoiceModel{DB: db},
+		templateCache: templateCache,
 	}
 
-	// mux - disabling directory listing
-	
 	// our own server
 	srv := &http.Server{
 		Addr: *addr,
