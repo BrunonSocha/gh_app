@@ -16,7 +16,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	invoices, err := app.invoices.ThisMonth()
+	invoices, err := app.invoices.LastMonth()
 	if err != nil {
 		app.serverError(w, err)
 		return

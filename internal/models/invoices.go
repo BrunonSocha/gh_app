@@ -61,8 +61,8 @@ func (m *InvoiceModel) Get(id int) (*Invoice, string, error) {
 
 }
 
-func (m *InvoiceModel) ThisMonth() ([]*Invoice, error) {
-	stmt := "SELECT * FROM Invoices WHERE data >= DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0) AND data < DATEADD(month, DATEDIFF(month, 0, GETDATE()) + 1, 0)"
+func (m *InvoiceModel) LastMonth() ([]*Invoice, error) {
+stmt := "SELECT * FROM Invoices WHERE data >= DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 1, 0) AND data < DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0)"
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
 		return nil, err
