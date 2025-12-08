@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/xml"
 	"math"
+	"strconv"
 	"time"
 )
 
@@ -138,7 +139,12 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 	var sprzedazWiersz []SprzedazWiersz
 	var zakupWiersz []ZakupWiersz
 	var companyName string
-	poprzedniVat := 10
+	var poprzedniVat int
+	now := time.Now()
+	previousMonth := now.AddDate(0, -1, 0)
+	previousPeriod := previousMonth.AddDate(0, -1, 0)
+	vatRow := m.DB.QueryRow("SELECT vat FROM JpkFiles WHERE year = @p1 AND month = @p2 AND confirmed_at IS NOT NULL", time.Now().Year(), previousPeriod.Month())
+	vatRow.Scan(&poprzedniVat)
 	saleCount := 1
 	purcCount := 1
 	for _, i := range inv {
@@ -162,12 +168,12 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 	}
 	var p_51 int
 	var p_53 int
-	if podatekNalezny > podatekNaliczony {
-		p_51 = math.Round(podatekNalezny) - math.Round(podatekNaliczony)
+	if podatekNalezny > (podatekNaliczony+float64(poprzedniVat)) {
+		p_51 = math.Round(podatekNalezny) - (math.Round(podatekNaliczony) + float64(poprzedniVat))
 		p_53 = 0
 	} else {
 		p_51 = 0
-		p_53 = math.Round(podatekNaliczony) - math.Round(podatekNalezny)
+		p_53 = math.Round(podatekNaliczony) + float64(poprzedniVat) - math.Round(podatekNalezny)
 	}
 	
 
@@ -189,8 +195,8 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 				Cel: 1
 			},
 			KodUrzedu: 1210,
-			Rok: 2025,
-			Miesiac: 11
+			Rok: time.Now().Year(),
+			Miesiac: previousMonth.Month()
 		},
 		Podmiot1: Podmiot1{
 			Rola: "Podatnik",
@@ -212,12 +218,12 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 				WariantFormularzaDekl: 22
 			},
 			PozycjeSzczegolowe: PozycjeSzczegolowe{
-				P_37: math.Round(podstawaSprzedazy),
-				P_38: math.Round(podatekNalezny),
+				P_37: int(math.Round(podstawaSprzedazy)),
+				P_38: int(math.Round(podatekNalezny)),
 				P_39: poprzedniVat,
-				P_42: math.Round(podstawaZakupu),
-				P_43: math.Round(podatekNaliczony),
-				P_48: poprzedniVat + math.Round(podatekNaliczony),
+				P_42: int(math.Round(podstawaZakupu)),
+				P_43: int(math.Round(podatekNaliczony)),
+				P_48: poprzedniVat + int(math.Round(podatekNaliczony)),
 				P_51: p_51,
 				P_53: p_53,
 				P_62: p_53,
@@ -239,6 +245,8 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 			}
 		}
 	}
-	
-
+	return jpk, nil
 }
+
+
+
