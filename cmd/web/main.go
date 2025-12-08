@@ -21,6 +21,7 @@ type application struct {
 	invoices *models.InvoiceModel
 	invTypes *models.InvoiceType
 	templateCache map[string]*template.Template
+	jpks *models.JPKModel
 }
 
 func main() {
@@ -51,6 +52,7 @@ func main() {
 		infoLog: infoLog,
 		invoices: &models.InvoiceModel{DB: db},
 		templateCache: templateCache,
+		jpks: &models.JPKModel{DB: db},
 	}
 
 	// our own server

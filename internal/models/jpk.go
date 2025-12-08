@@ -3,8 +3,8 @@ package models
 import (
 	"database/sql"
 	"encoding/xml"
+	"errors"
 	"math"
-	"strconv"
 	"time"
 )
 
@@ -71,7 +71,7 @@ type NaglowekDekl struct {
 type KodFormularzaDekl struct {
 	KodSystemowy string `xml:"kodSystemowy,attr"`
 	KodPodatku string `xml:"kodPodatku,attr"`
-	RodzajZobowiazania string `xml:"rodzajZobowiazania"`
+	RodzajZobowiazania string `xml:"rodzajZobowiazania,attr"`
 	WersjaSchemy string `xml:"wersjaSchemy,attr"`
 	Kod string `xml:",chardata"`
 }
@@ -129,9 +129,7 @@ type ZakupCtrl struct {
 	PodatekNaliczony float64 `xml:"PodatekNaliczony"`
 }
 
-func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
-	var saleInv []*Invoice
-	var purcInv []*Invoice
+func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
 	var podatekNaliczony float64 = 0
 	var podatekNalezny float64 = 0
 	var podstawaSprzedazy float64 = 0
@@ -143,10 +141,16 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 	now := time.Now()
 	previousMonth := now.AddDate(0, -1, 0)
 	previousPeriod := previousMonth.AddDate(0, -1, 0)
-	vatRow := m.DB.QueryRow("SELECT vat FROM JpkFiles WHERE year = @p1 AND month = @p2 AND confirmed_at IS NOT NULL", time.Now().Year(), previousPeriod.Month())
-	vatRow.Scan(&poprzedniVat)
-	saleCount := 1
-	purcCount := 1
+	err := m.DB.QueryRow("SELECT vat FROM JpkFiles WHERE year = @p1 AND month = @p2 AND confirmed_at IS NOT NULL", time.Now().Year(), previousPeriod.Month()).Scan(&poprzedniVat)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			poprzedniVat = 0
+		} else {
+			return nil, err
+		}
+	}
+	saleCount := 0
+	purcCount := 0
 	for _, i := range inv {
 		nameRow := m.DB.QueryRow("SELECT name FROM Companies WHERE nip = @p1", i.Nip)
 		err := nameRow.Scan(&companyName)
@@ -155,25 +159,25 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 		}
 		switch i.Inv_type {
 		case SaleInvoice:
+			saleCount++
 			podatekNalezny += i.Podatek
 			podstawaSprzedazy += i.Netto
 			sprzedazWiersz = append(sprzedazWiersz, SprzedazWiersz{LpSprzedazy: saleCount, KodKrajuNadaniaTIN: "PL", NrKontrahenta: i.Nip, NazwaKontrahenta: companyName, DowodSprzedazy: i.Nr_faktury, DataWystawienia: string(i.Data.Format("2006-01-02")), K_19: i.Netto, K_20: i.Podatek})
-			saleCount++
 		case PurchaseInvoice:
+			purcCount++
 			podatekNaliczony += i.Podatek
 			podstawaZakupu += i.Netto
 			zakupWiersz = append(zakupWiersz, ZakupWiersz{LpZakupu: purcCount, KodKrajuNadaniaTIN: "PL", NrDostawcy: i.Nip, NazwaDostawcy: companyName, DowodZakupu: i.Nr_faktury, DataZakupu: string(i.Data.Format("2006-01-02")), K_42: i.Netto, K_43: i.Podatek})
-			purcCount++
 		}
 	}
 	var p_51 int
 	var p_53 int
 	if podatekNalezny > (podatekNaliczony+float64(poprzedniVat)) {
-		p_51 = math.Round(podatekNalezny) - (math.Round(podatekNaliczony) + float64(poprzedniVat))
+		p_51 = int(math.Round(podatekNalezny) - (math.Round(podatekNaliczony) + float64(poprzedniVat)))
 		p_53 = 0
 	} else {
 		p_51 = 0
-		p_53 = math.Round(podatekNaliczony) + float64(poprzedniVat) - math.Round(podatekNalezny)
+		p_53 = int(math.Round(podatekNaliczony) + float64(poprzedniVat) - math.Round(podatekNalezny))
 	}
 	
 
@@ -185,18 +189,18 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 			KodFormularza: KodFormularza {
 				KodSystemowy: "JPK_V7M (2)",
 				WersjaSchemy: "1-0E",
-				Kod: "JPK_VAT"
+				Kod: "JPK_VAT",
 			},
 			WariantFormularza: 2,
 			DataWytworzeniaJPK: string(time.Now().Format("2006-01-02T15:04:05-0700")),
 			NazwaSystemu: "Formularz uproszczony",
 			CelZlozenia: CelZlozenia{
 				Poz: "P_7",
-				Cel: 1
+				Cel: 1,
 			},
 			KodUrzedu: 1210,
 			Rok: time.Now().Year(),
-			Miesiac: previousMonth.Month()
+			Miesiac: int(previousMonth.Month()),
 		},
 		Podmiot1: Podmiot1{
 			Rola: "Podatnik",
@@ -204,8 +208,8 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 				NIP: "6793194113",
 				PelnaNazwa: "Grey House sp. z o.o.",
 				Email: "info@greyhouse.es",
-				Telefon: "608415900"
-			}
+				Telefon: "608415900",
+			},
 		},
 		Deklaracja: Deklaracja {
 			Naglowek: NaglowekDekl{
@@ -213,9 +217,10 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 					KodSystemowy: "VAT-7 (22)",
 					KodPodatku: "VAT",
 					RodzajZobowiazania: "Z",
-					WersjaSchemy: "1-0E"
+					WersjaSchemy: "1-0E",
+					Kod: "VAT-7",
 				},
-				WariantFormularzaDekl: 22
+				WariantFormularzaDekl: 22,
 			},
 			PozycjeSzczegolowe: PozycjeSzczegolowe{
 				P_37: int(math.Round(podstawaSprzedazy)),
@@ -228,22 +233,22 @@ func (m *JPKModel) newJpk(inv []*Invoice) (*JPK, error) {
 				P_53: p_53,
 				P_62: p_53,
 				P_68: 0,
-				P_69: 0
+				P_69: 0,
 			},
-			Pouczenia: 1
+			Pouczenia: 1,
 		},
 		Ewidencja: Ewidencja{
 			SprzedazWiersz: sprzedazWiersz,
 			SprzedazCtrl: SprzedazCtrl{
 				LiczbaWierszySprzedazy: saleCount,
-				PodatekNalezny: podatekNalezny
+				PodatekNalezny: podatekNalezny,
 			},
 			ZakupWiersz: zakupWiersz,
 			ZakupCtrl: ZakupCtrl{
 				LiczbaWierszyZakupow: purcCount,
-				PodatekNaliczony: podatekNaliczony
-			}
-		}
+				PodatekNaliczony: podatekNaliczony,
+			},
+		},
 	}
 	return jpk, nil
 }

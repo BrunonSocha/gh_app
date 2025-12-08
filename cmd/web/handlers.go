@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"net/http"
@@ -89,5 +90,29 @@ func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Tworzenie pliku JPK..."))
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+	invoices, err := app.invoices.LastMonth()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	jpk, err := app.jpks.NewJpk(invoices)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	out, err := xml.MarshalIndent(jpk, "", "   ")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	fmt.Fprintf(w, string(out))
+
 }
