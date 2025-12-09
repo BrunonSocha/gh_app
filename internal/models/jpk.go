@@ -192,7 +192,7 @@ func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
 				Kod: "JPK_VAT",
 			},
 			WariantFormularza: 2,
-			DataWytworzeniaJPK: string(time.Now().Format("2006-01-02T15:04:05-0700")),
+			DataWytworzeniaJPK: string(time.Now().Format(time.RFC3339Nano)),
 			NazwaSystemu: "Formularz uproszczony",
 			CelZlozenia: CelZlozenia{
 				Poz: "P_7",
@@ -253,5 +253,86 @@ func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
 	return jpk, nil
 }
 
+func (m *JPKModel) Get(id int) (*JPK, error){
+	stmt := "SELECT xml_content FROM JpkFiles WHERE id = @p1"
+	row := m.DB.QueryRow(stmt, id)
+	var byteArray []byte
+	err := row.Scan(&byteArray)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoRecord
+		} else {
+			return nil, err
+		}
+	}
 
+	jpk := &JPK{}
+	err = xml.Unmarshal(byteArray, jpk)
+	if err != nil {
+		return nil, err
+	}
+	return jpk, nil
+}
 
+func (m *JPKModel) GetAll() ([]*JPK, error) {
+	stmt := "SELECT xml_content FROM JpkFiles WHERE confirmed_at IS NOT NULL"
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	
+	var byteArray []byte
+
+	jpkfiles := []*JPK{}
+	for rows.Next() {
+		jpk := &JPK{}
+		err = rows.Scan(&byteArray)
+		if err != nil {
+			return nil, err
+		}
+		err = xml.Unmarshal(byteArray, jpk)
+		if err != nil {
+			return nil, err
+		}
+		jpkfiles = append(jpkfiles, jpk)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return jpkfiles, nil
+}
+
+func (m *JPKModel) Confirm(id int) (error) {
+	stmt := "UPDATE JpkFiles SET confirmed_at = @p1 WHERE id = @p2"
+	rows, err := m.DB.Exec(stmt, time.Now(), id)
+	if err != nil {
+		return err
+	}
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAff == 0 {
+		return ErrNoRecord
+	}
+	return nil
+}
+
+func (m *JPKModel) Delete(id int) (error) {
+	stmt := "DELETE FROM JpkFiles WHERE id = @p1 AND confirmed_at IS NULL"
+	row, err := m.DB.Exec(stmt, id)
+	if err != nil {
+		return err
+	}
+	rowsAff, err := row.RowsAffected()
+	if err != nil {
+		return err
+	} 
+
+	if rowsAff == 0 {
+		return ErrNoRecord
+	}
+	return nil
+}

@@ -3,7 +3,6 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -39,7 +38,7 @@ func (m *InvoiceModel) Insert(nip string, nr_faktury string, netto float64, poda
 }
 
 func (m *InvoiceModel) Get(id int) (*Invoice, string, error) {
-	stmt := fmt.Sprintf("SELECT id, nip, nr_faktury, netto, podatek, data, type FROM Invoices WHERE id = @p1")
+	stmt := "SELECT id, nip, nr_faktury, netto, podatek, data, type FROM Invoices WHERE id = @p1"
 	cStmt := "SELECT nazwa FROM Companies WHERE nip = @p1"
 	row := m.DB.QueryRow(stmt, id)
 	inv := &Invoice{}
@@ -62,7 +61,7 @@ func (m *InvoiceModel) Get(id int) (*Invoice, string, error) {
 }
 
 func (m *InvoiceModel) LastMonth() ([]*Invoice, error) {
-stmt := "SELECT * FROM Invoices WHERE data >= DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 1, 0) AND data < DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0)"
+	stmt := "SELECT * FROM Invoices WHERE data >= DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 1, 0) AND data < DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0)"
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
 		return nil, err
@@ -84,3 +83,20 @@ stmt := "SELECT * FROM Invoices WHERE data >= DATEADD(month, DATEDIFF(month, 0, 
 	}
 	return invoices, err
 }
+
+func (m *InvoiceModel) Delete(id int) (error) {
+	stmt := "DELETE FROM Invoices WHERE id = @p1"
+	row, err := m.DB.Exec(stmt, id)
+	if err != nil {
+		return err
+	}
+	rowsAff, err := row.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAff == 0 {
+		return ErrNoRecord
+	}
+	return nil
+}
+

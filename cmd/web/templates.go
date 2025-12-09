@@ -11,7 +11,6 @@ type templateData struct {
 	Invoice *models.Invoice
 	Invoices []*models.Invoice
 	CompanyName string
-	TotalVat float64
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

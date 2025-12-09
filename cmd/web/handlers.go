@@ -37,7 +37,7 @@ func (app *application) addInvoice(w http.ResponseWriter, r *http.Request) {
 	nip := "1488148888"
 	netto := 100
 	podatek := 23
-	data := time.Now()
+	data := time.Now().AddDate(0, -1, 0)
 	inv_type := models.PurchaseInvoice
 	nazwa := "Nucysfera sp. z o.o."
 
@@ -72,7 +72,7 @@ func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	app.render(w, http.StatusOK, "view.tmpl", &templateData{Invoice: inv, CompanyName: cname})
+	app.render(w, http.StatusOK, "view_invoice.tmpl", &templateData{Invoice: inv, CompanyName: cname})
 }
 
 func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
@@ -90,8 +90,8 @@ func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.Header().Set("Allow", http.MethodGet)
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
@@ -106,12 +106,13 @@ func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-
-	out, err := xml.MarshalIndent(jpk, "", "   ")
+	Header := `<?xml version="1.0" encoding="UTF-8"?>` + "\n"
+	out, err := xml.MarshalIndent(jpk, "", "  ")
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
+	out = []byte(Header + string(out))
 
 	fmt.Fprintf(w, string(out))
 
