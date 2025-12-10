@@ -15,7 +15,7 @@ type JPKModel struct {
 type JPKMetadata struct {
 	Id int
 	ConfirmedAt *time.Time
-	UPO sql.NullString
+	UPO *string
 	Rok int
 	Miesiac int
 }
@@ -278,7 +278,7 @@ func (m *JPKModel) Get(id int) (*JPK, *JPKMetadata, error){
 	var byteArray []byte
 	jpkmetadata := &JPKMetadata{}
 	err := row.Scan(&byteArray, &jpkmetadata.Id, &jpkmetadata.ConfirmedAt, &jpkmetadata.UPO)
-	if err != nil {
+	if err != nil || len(byteArray) == 0{
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil, ErrNoRecord
 		} else {

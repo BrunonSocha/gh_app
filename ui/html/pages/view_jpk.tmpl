@@ -23,7 +23,7 @@
                 <span class="label">Wygenerowane:</span>
                 <span class="value">{{.Jpk.Naglowek.DataWytworzeniaJPK}}</span>
             </div>
-            {{if .UPO}}
+            {{if .JpkMetadata.UPO}}
             <div class="meta-item">
                 <span class="label">UPO Ref:</span>
                 <span class="value code">{{.JpkMetadata.UPO}}</span>
@@ -139,14 +139,14 @@
     </div>
 
     <div class="actions-footer">
-        {{if not .ConfirmedAt}}
-            <form action="/jpk/delete/{{.Id}}" method="DELETE" style="display:inline;">
+        {{if not .JpkMetadata.ConfirmedAt}}
+            <form action="/jpk/delete/{{.JpkMetadata.Id}}" method="DELETE" style="display:inline;">
                 <button type="submit" class="btn danger">Usuń wersję roboczą</button>
             </form>
-            <a href="/jpk/download/{{.Id}}" class="btn primary">Pobierz XML</a>
-            <button onclick="openConfirmModal({{.ID}})" class="btn success">Zatwierdź</button>
+            <a href="/jpk/download/{{.JpkMetadata.Id}}" class="btn primary">Pobierz XML</a>
+            <button onclick="openConfirmModal({{.JpkMetadata.Id}})" class="btn success">Zatwierdź</button>
         {{else}}
-            <a href="/jpk/download/{{.Id}}" class="btn secondary">Download Copy</a>
+            <a href="/jpk/download/{{.JpkMetadata.Id}}" class="btn secondary">Download Copy</a>
         {{end}}
     </div>
 
