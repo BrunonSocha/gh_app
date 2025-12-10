@@ -12,6 +12,14 @@ type JPKModel struct {
 	DB *sql.DB
 }
 
+type JPKMetadata struct {
+	Id int
+	Confirmed_at *time.Time
+	UPO sql.NullString
+	Rok int
+	Miesiac int
+}
+
 type JPK struct {
 	XMLName xml.Name `xml:JPK`
 	XMLTypes string `xml:"xmlns:etd,attr"`
@@ -152,7 +160,7 @@ func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
 	saleCount := 0
 	purcCount := 0
 	for _, i := range inv {
-		nameRow := m.DB.QueryRow("SELECT name FROM Companies WHERE nip = @p1", i.Nip)
+		nameRow := m.DB.QueryRow("SELECT nazwa FROM Companies WHERE nip = @p1", i.Nip)
 		err := nameRow.Scan(&companyName)
 		if err != nil {
 			return nil, err
@@ -253,25 +261,30 @@ func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
 	return jpk, nil
 }
 
-func (m *JPKModel) Get(id int) (*JPK, error){
-	stmt := "SELECT xml_content FROM JpkFiles WHERE id = @p1"
+func (m *JPKModel) InsertDB(jpk_data JPK) error {
+	// implement insertion to DB after creation
+}
+
+func (m *JPKModel) Get(id int) (*JPK, *JPKMetadata, error){
+	stmt := "SELECT xml_content, id, confirmed_at, upo_reference_number FROM JpkFiles WHERE id = @p1"
 	row := m.DB.QueryRow(stmt, id)
 	var byteArray []byte
-	err := row.Scan(&byteArray)
+	jpkmetadata := &JPKMetadata{}
+	err := row.Scan(&byteArray, &jpkmetadata.Id, &jpkmetadata.Confirmed_at, &jpkmetadata.UPO)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNoRecord
+			return nil, nil, ErrNoRecord
 		} else {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
 	jpk := &JPK{}
 	err = xml.Unmarshal(byteArray, jpk)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return jpk, nil
+	return jpk, jpkmetadata, nil
 }
 
 func (m *JPKModel) GetAll() ([]*JPK, error) {

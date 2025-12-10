@@ -46,7 +46,7 @@ func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/viewinvoice?id=%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/viewinvoice/%d", id), http.StatusSeeOther)
 }
 
 func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +80,13 @@ func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	fmt.Fprintf(w, "Wyświetl JPK o ID %d...", id)
+	data := app.newTemplateData(r)
+	data.Jpk, data.JpkMetadata, err = app.jpks.Get(id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.render(w, http.StatusOK, "view_jpk.tmpl", data)
 }
 
 func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
@@ -107,4 +113,15 @@ func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 	// redirect to view jpk.
 	fmt.Fprintf(w, string(out))
 
+}
+
+func (app *application) jpkDelete(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	id, err := strconv.Atoi(params.ByName("id"))
+	err = app.jpks.Delete(id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	fmt.Fprintf(w, "Usunięto JPK o id %d", params)
 }

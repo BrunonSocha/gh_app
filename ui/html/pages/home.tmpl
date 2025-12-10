@@ -14,7 +14,7 @@
         </tr>
         {{range .Invoices}}
         <tr>
-            <td><a href='/viewinvoice?id={{.Id}}'>{{.Nr_faktury}}</a></td>
+            <td><a href='/viewinvoice/{{.Id}}'>{{.Nr_faktury}}</a></td>
             <td>{{.Nip}}</td>
             <td>{{.Netto}}</td>
             <td>{{.Podatek}}</td>

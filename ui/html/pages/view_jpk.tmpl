@@ -1,4 +1,4 @@
-{{define "title"}}JPK #{{.Id}}{{end}}
+{{define "title"}}JPK #{{.JpkMetadata.Id}}{{end}}
 
 {{define "main"}}
 <div class="jpk-container">
@@ -12,9 +12,9 @@
             </div>
             <div class="meta-item">
                 <span class="label">Status:</span>
-                {{if .ConfirmedAt}}
+                {{if .JpkMetadata.ConfirmedAt}}
                     <span class="badge success">ZATWIERDZONE</span>
-                    <small>{{.ConfirmedAt.Format "2006-01-02 15:04"}}</small>
+                    <small>{{.JpkMetadata.ConfirmedAt.Format "2006-01-02 15:04"}}</small>
                 {{else}}
                     <span class="badge warning">WERSJA ROBOCZA</span>
                 {{end}}
@@ -26,7 +26,7 @@
             {{if .UPO}}
             <div class="meta-item">
                 <span class="label">UPO Ref:</span>
-                <span class="value code">{{.UPO}}</span>
+                <span class="value code">{{.JpkMetadata.UPO}}</span>
             </div>
             {{end}}
         </div>

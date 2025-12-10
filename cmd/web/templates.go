@@ -12,6 +12,7 @@ type templateData struct {
 	Invoices []*models.Invoice
 	CompanyName string
 	Jpk *models.JPK
+	JpkMetadata *models.JPKMetadata
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {
