@@ -110,8 +110,13 @@ func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	out = []byte(Header + string(out))
+	id, err := app.jpks.InsertDB(jpk, string(out))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 	// redirect to view jpk.
-	fmt.Fprintf(w, string(out))
+	http.Redirect(w, r, fmt.Sprintf("/jpk/view/%d", id), http.StatusSeeOther)
 
 }
 

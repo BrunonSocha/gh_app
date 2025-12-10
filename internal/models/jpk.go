@@ -14,7 +14,7 @@ type JPKModel struct {
 
 type JPKMetadata struct {
 	Id int
-	Confirmed_at *time.Time
+	ConfirmedAt *time.Time
 	UPO sql.NullString
 	Rok int
 	Miesiac int
@@ -261,8 +261,15 @@ func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
 	return jpk, nil
 }
 
-func (m *JPKModel) InsertDB(jpk_data JPK) error {
+func (m *JPKModel) InsertDB(jpk *JPK, jpk_data string) (int, error) {
 	// implement insertion to DB after creation
+	stmt := "INSERT INTO JpkFiles(year, month, xml_content, generated_at) OUTPUT Inserted.id VALUES(@p1, @p2, @p3, @p4)"
+	var resId int
+	err := m.DB.QueryRow(stmt, jpk.Naglowek.Rok, jpk.Naglowek.Miesiac, jpk_data, time.Now()).Scan(&resId)
+	if err != nil {
+		return 0, err
+	}
+	return resId, nil
 }
 
 func (m *JPKModel) Get(id int) (*JPK, *JPKMetadata, error){
@@ -270,7 +277,7 @@ func (m *JPKModel) Get(id int) (*JPK, *JPKMetadata, error){
 	row := m.DB.QueryRow(stmt, id)
 	var byteArray []byte
 	jpkmetadata := &JPKMetadata{}
-	err := row.Scan(&byteArray, &jpkmetadata.Id, &jpkmetadata.Confirmed_at, &jpkmetadata.UPO)
+	err := row.Scan(&byteArray, &jpkmetadata.Id, &jpkmetadata.ConfirmedAt, &jpkmetadata.UPO)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil, ErrNoRecord
