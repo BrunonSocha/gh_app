@@ -140,13 +140,13 @@
 
     <div class="actions-footer">
         {{if not .ConfirmedAt}}
-            <form action="/jpk/delete/{{.ID}}" method="POST" style="display:inline;">
+            <form action="/jpk/delete/{{.Id}}" method="DELETE" style="display:inline;">
                 <button type="submit" class="btn danger">Usuń wersję roboczą</button>
             </form>
-            <a href="/jpk/download/{{.ID}}" class="btn primary">Pobierz XML</a>
+            <a href="/jpk/download/{{.Id}}" class="btn primary">Pobierz XML</a>
             <button onclick="openConfirmModal({{.ID}})" class="btn success">Zatwierdź</button>
         {{else}}
-            <a href="/jpk/download/{{.ID}}" class="btn secondary">Download Copy</a>
+            <a href="/jpk/download/{{.Id}}" class="btn secondary">Download Copy</a>
         {{end}}
     </div>
 
