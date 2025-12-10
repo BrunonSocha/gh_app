@@ -22,6 +22,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodPost, "/jpk/create", app.jpkCreate)
 	router.HandlerFunc(http.MethodGet, "/jpk/view/:id", app.jpkView)
 	router.HandlerFunc(http.MethodDelete, "/jpk/delete/:id", app.jpkDelete)
+	router.HandlerFunc(http.MethodGet, "/jpk/viewall", app.jpkViewAll)
 	
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 	return standard.Then(router)

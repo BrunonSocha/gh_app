@@ -294,29 +294,22 @@ func (m *JPKModel) Get(id int) (*JPK, *JPKMetadata, error){
 	return jpk, jpkmetadata, nil
 }
 
-func (m *JPKModel) GetAll() ([]*JPK, error) {
-	// dumb approach - no point in unmarshalling the entirety of JPK database just to display a list in a template. GetAll should get JpkData (new struct) necessary to display info in a list. On click, Get() method should be activated and the user redirected to viewJpk.
-	stmt := "SELECT xml_content FROM JpkFiles WHERE confirmed_at IS NOT NULL"
+func (m *JPKModel) GetAll() ([]*JPKMetadata, error) {
+	stmt := "SELECT id, confirmed_at, upo_reference_number, year, month FROM JpkFiles"
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	
-	var byteArray []byte
 
-	jpkfiles := []*JPK{}
+	jpkfiles := []*JPKMetadata{}
 	for rows.Next() {
-		jpk := &JPK{}
-		err = rows.Scan(&byteArray)
+		jpkdata := &JPKMetadata{}
+		err = rows.Scan(&jpkdata.Id, &jpkdata.ConfirmedAt, &jpkdata.UPO, &jpkdata.Rok, &jpkdata.Miesiac)
 		if err != nil {
 			return nil, err
 		}
-		err = xml.Unmarshal(byteArray, jpk)
-		if err != nil {
-			return nil, err
-		}
-		jpkfiles = append(jpkfiles, jpk)
+		jpkfiles = append(jpkfiles, jpkdata)
 	}
 
 	if err = rows.Err(); err != nil {

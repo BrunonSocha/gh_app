@@ -89,6 +89,16 @@ func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "view_jpk.tmpl", data)
 }
 
+func (app *application) jpkViewAll(w http.ResponseWriter, r *http.Request) {
+	jpks, err := app.jpks.GetAll()
+	if err != nil {
+		app.serverError(w, err)
+	}
+	data := app.newTemplateData(r)
+	data.JpkListData = jpks
+	app.render(w, http.StatusOK, "jpk_files.tmpl", data)
+}
+
 func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 	invoices, err := app.invoices.LastMonth()
 	if err != nil {

@@ -1,0 +1,29 @@
+{{define "title"}}Pliki JPK{{end}}
+
+{{define "main"}}
+    <h2>Lista plików JPK:</h2>
+    {{if .JpkListData}}
+    <table>
+        <tr>
+            <th>Nr Faktury</th>
+            <th>NIP</th>
+            <th>Netto</th>
+            <th>Podatek</th>
+            <th>Data</th>
+            <th>Typ</th>
+        </tr>
+        {{range .JpkListData}}
+        <tr>
+            <td><a href='/jpk/view/{{.Id}}'>Zobacz</a></td>
+            <td>{{.Id}}</td>
+            <td>{{.Miesiac}}</td>
+            <td>{{.Rok}}</td>
+            <td>{{.ConfirmedAt}}</td>
+            <td>{{.UPO}}</td>
+        </tr>
+        {{end}}
+    </table>
+    {{else}}
+        <p>Nie ma jeszcze plików JPK.</p>
+    {{end}}
+{{end}}
