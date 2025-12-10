@@ -9,29 +9,28 @@ import (
 	"time"
 
 	"app.greyhouse.es/internal/models"
+	"github.com/julienschmidt/httprouter"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		app.notFound(w)
-		return
-	}
 
 	invoices, err := app.invoices.LastMonth()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
+
+	data := app.newTemplateData(r)
+	data.Invoices = invoices
 	
-	app.render(w, http.StatusOK, "home.tmpl", &templateData{Invoices: invoices})
+	app.render(w, http.StatusOK, "home.tmpl", data)
 }
 
 func (app *application) addInvoice(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
+	w.Write([]byte("Show the form to create a new invoice.."))
+}
+
+func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 
 	nr_faktury := "faktura 1488"
 	nip := "1488148888"
@@ -51,18 +50,17 @@ func (app *application) addInvoice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.Header().Set("Allow", http.MethodGet)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	params := httprouter.ParamsFromContext(r.Context())
+	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil || id < 1 {
 		app.notFound(w)
 		return
 	}
 
 	inv, cname, err := app.invoices.Get(id)
+	data := app.newTemplateData(r)
+	data.Invoice = inv
+	data.CompanyName = cname
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			app.notFound(w)
@@ -72,16 +70,12 @@ func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	app.render(w, http.StatusOK, "view_invoice.tmpl", &templateData{Invoice: inv, CompanyName: cname})
+	app.render(w, http.StatusOK, "view_invoice.tmpl", data)
 }
 
 func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.Header().Set("Allow", http.MethodGet)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	params := httprouter.ParamsFromContext(r.Context())
+	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
 		app.notFound(w)
 		return
@@ -90,11 +84,6 @@ func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
 	invoices, err := app.invoices.LastMonth()
 	if err != nil {
 		app.serverError(w, err)
@@ -102,6 +91,8 @@ func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jpk, err := app.jpks.NewJpk(invoices)
+
+	// add the jpk to a newTemplateData. Create a template for displaying jpks.
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -113,7 +104,7 @@ func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	out = []byte(Header + string(out))
-
+	// redirect to view jpk.
 	fmt.Fprintf(w, string(out))
 
 }

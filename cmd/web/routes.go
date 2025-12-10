@@ -1,19 +1,28 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	"github.com/justinas/alice"
+	"github.com/julienschmidt/httprouter"
+)
 
-func (app *application) routes() *http.ServeMux {
-		mux := http.NewServeMux()
-	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static/")})
-	mux.Handle("/static", http.NotFoundHandler())
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+func (app *application) routes() http.Handler {
 	
-	// handling functions
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/addinvoice", app.addInvoice)
-	mux.HandleFunc("/viewinvoice", app.viewInvoice)
-	mux.HandleFunc("/jpk/create", app.jpkCreate)
-	mux.HandleFunc("/jpk/view", app.jpkView)
+	router := httprouter.New()
 
-	return mux
+	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static/")})
+
+	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
+
+	// handling functions
+	router.HandlerFunc(http.MethodGet, "/", app.home)
+	router.HandlerFunc(http.MethodGet, "/addinvoice", app.addInvoice)
+	router.HandlerFunc(http.MethodPost, "addinvoice", app.addInvoicePost)
+	router.HandlerFunc(http.MethodGet, "/viewinvoice/:id", app.viewInvoice)
+	router.HandlerFunc(http.MethodPost, "/jpk/create", app.jpkCreate)
+	router.HandlerFunc(http.MethodGet, "/jpk/view", app.jpkView)
+	
+	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
+	return standard.Then(mux)
 }
+

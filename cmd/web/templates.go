@@ -11,6 +11,7 @@ type templateData struct {
 	Invoice *models.Invoice
 	Invoices []*models.Invoice
 	CompanyName string
+	Jpk *models.JPK
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {
@@ -42,3 +43,4 @@ func newTemplateCache() (map[string]*template.Template, error) {
 	}
 	return cache, nil
 } 
+

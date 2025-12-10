@@ -1,47 +1,154 @@
-{{define "title"}}Faktura #{{.Invoice.Id}}{{end}}
+{{define "title"}}JPK #{{.Id}}{{end}}
 
 {{define "main"}}
-    {{with .Invoice}}
-    <div class='invoice'>
-        <div class='metadata'>
-            <span class="inv-type">{{.Inv_type}}</span>
-        <strong>{{.Nr_faktury}}</strong>
-            <span class="inv-id">#{{.Id}}</span>
+<div class="jpk-container">
+    
+    <div class="jpk-header">
+        <h1>JPK_V7M</h1>
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span class="label">Okres:</span>
+                <span class="value">{{.Jpk.Naglowek.Miesiac}} / {{.Jpk.Naglowek.Rok}}</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">Status:</span>
+                {{if .ConfirmedAt}}
+                    <span class="badge success">ZATWIERDZONE</span>
+                    <small>{{.ConfirmedAt.Format "2006-01-02 15:04"}}</small>
+                {{else}}
+                    <span class="badge warning">WERSJA ROBOCZA</span>
+                {{end}}
+            </div>
+            <div class="meta-item">
+                <span class="label">Wygenerowane:</span>
+                <span class="value">{{.Jpk.Naglowek.DataWytworzeniaJPK}}</span>
+            </div>
+            {{if .UPO}}
+            <div class="meta-item">
+                <span class="label">UPO Ref:</span>
+                <span class="value code">{{.UPO}}</span>
+            </div>
+            {{end}}
         </div>
+    </div>
 
-        <div class="values-section">
-            <div class="dotted-row">
-                <span class="label">Netto</span>
-                <span class="dots"></span>
-                <span class="value val-netto">{{.Netto}}</span>
+    <div class="jpk-summary-card">
+        <h2>Podsumowanie deklaracji</h2>
+        <div class="summary-grid">
+            <div class="sum-col">
+                <h3>Sprzedaż (Należny)</h3>
+                <div class="row">
+                    <span>Netto (P_37):</span>
+                    <strong>{{.Jpk.Deklaracja.PozycjeSzczegolowe.P_37}} PLN</strong>
+                </div>
+                <div class="row">
+                    <span>VAT (P_38):</span>
+                    <strong>{{.Jpk.Deklaracja.PozycjeSzczegolowe.P_38}} PLN</strong>
+                </div>
             </div>
-            <div class="dotted-row">
-                <span class="label">Podatek</span>
-                <span class="dots"></span>
-                <span class="value val-podatek">{{.Podatek}}</span>
+            <div class="sum-col">
+                <h3>Zakup (Naliczony)</h3>
+                <div class="row">
+                    <span>Z poprzedniego (P_39):</span>
+                    <strong>{{.Jpk.Deklaracja.PozycjeSzczegolowe.P_39}} PLN</strong>
+                </div>
+                <div class="row">
+                    <span>VAT (P_43):</span>
+                    <strong>{{.Jpk.Deklaracja.PozycjeSzczegolowe.P_43}} PLN</strong>
+                </div>
+                <div class="row total">
+                    <span>Łączny podatek (P_48):</span>
+                    <strong>{{.Jpk.Deklaracja.PozycjeSzczegolowe.P_48}} PLN</strong>
+                </div>
             </div>
-            <div class="dotted-row brutto-row">
-                <span class="label">Brutto</span>
-                <span class="dots"></span>
-                <span class="value val-brutto"></span>
-            </div>
-        </div>
-
-        <div class='metadata bottom-meta'>
-            <div class="date-box">
-                <span class="date-label">Data:</span>
-                <span class="date-value">{{.Data.Format "02-01-2006"}}</span>
-            </div>
-            <div class="company-box">
-                {{$.CompanyName}}
-            </div>
-            <div class="nip-box">
-                <span class="nip-label">NIP:</span>
-                <span class="nip-value">{{.Nip}}</span>
+            <div class="sum-col result {{if gt .Jpk.Deklaracja.PozycjeSzczegolowe.P_51 0}}pay{{else}}carry{{end}}">
+                <h3>Result</h3>
+                {{if gt .Jpk.Deklaracja.PozycjeSzczegolowe.P_51 0}}
+                    <div class="row big">
+                        <span>Do zapłaty (P_51):</span>
+                        <strong>{{.Jpk.Deklaracja.PozycjeSzczegolowe.P_51}} PLN</strong>
+                    </div>
+                {{else}}
+                    <div class="row big">
+                        <span>Do przeniesienia (P_53):</span>
+                        <strong>{{.Jpk.Deklaracja.PozycjeSzczegolowe.P_53}} PLN</strong>
+                    </div>
+                {{end}}
             </div>
         </div>
     </div>
 
-    <script src='/static/js/invoice.js' type='text/javascript'></script>
-    {{end}}
+    <div class="registry-section">
+        <h3>Lista sprzedaży: ({{.Jpk.Ewidencja.SprzedazCtrl.LiczbaWierszySprzedazy}})</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Nr</th>
+                    <th>Nr faktury</th>
+                    <th>Data</th>
+                    <th>Kontrahent</th>
+                    <th>NIP</th>
+                    <th class="text-right">Netto</th>
+                    <th class="text-right">VAT</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Jpk.Ewidencja.SprzedazWiersz}}
+                <tr>
+                    <td>{{.LpSprzedazy}}</td>
+                    <td>{{.DowodSprzedazy}}</td>
+                    <td>{{.DataWystawienia}}</td>
+                    <td>{{.NazwaKontrahenta}}</td>
+                    <td>{{.NrKontrahenta}}</td>
+                    <td class="text-right">{{printf "%.2f" .K_19}}</td>
+                    <td class="text-right">{{printf "%.2f" .K_20}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="registry-section">
+        <h3>Lista zakupów ({{.Jpk.Ewidencja.ZakupCtrl.LiczbaWierszyZakupow}})</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Nr</th>
+                    <th>Nr faktury</th>
+                    <th>Data</th>
+                    <th>Dostawca</th>
+                    <th>NIP</th>
+                    <th class="text-right">Netto</th>
+                    <th class="text-right">VAT</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Jpk.Ewidencja.ZakupWiersz}}
+                <tr>
+                    <td>{{.LpZakupu}}</td>
+                    <td>{{.DowodZakupu}}</td>
+                    <td>{{.DataZakupu}}</td>
+                    <td>{{.NazwaDostawcy}}</td>
+                    <td>{{.NrDostawcy}}</td>
+                    <td class="text-right">{{printf "%.2f" .K_42}}</td>
+                    <td class="text-right">{{printf "%.2f" .K_43}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions-footer">
+        {{if not .ConfirmedAt}}
+            <form action="/jpk/delete/{{.ID}}" method="POST" style="display:inline;">
+                <button type="submit" class="btn danger">Usuń wersję roboczą</button>
+            </form>
+            <a href="/jpk/download/{{.ID}}" class="btn primary">Pobierz XML</a>
+            <button onclick="openConfirmModal({{.ID}})" class="btn success">Zatwierdź</button>
+        {{else}}
+            <a href="/jpk/download/{{.ID}}" class="btn secondary">Download Copy</a>
+        {{end}}
+    </div>
+
+</div>
 {{end}}

@@ -275,6 +275,7 @@ func (m *JPKModel) Get(id int) (*JPK, error){
 }
 
 func (m *JPKModel) GetAll() ([]*JPK, error) {
+	// dumb approach - no point in unmarshalling the entirety of JPK database just to display a list in a template. GetAll should get JpkData (new struct) necessary to display info in a list. On click, Get() method should be activated and the user redirected to viewJpk.
 	stmt := "SELECT xml_content FROM JpkFiles WHERE confirmed_at IS NOT NULL"
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
