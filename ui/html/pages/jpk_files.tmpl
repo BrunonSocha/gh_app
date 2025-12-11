@@ -3,26 +3,43 @@
 {{define "main"}}
     <h2>Lista plików JPK:</h2>
     {{if .JpkListData}}
-    <table>
-        <tr>
-            <th>Nr Faktury</th>
-            <th>NIP</th>
-            <th>Netto</th>
-            <th>Podatek</th>
-            <th>Data</th>
-            <th>Typ</th>
-        </tr>
+    <table class="jpk-list-table">
+        <thead>
+            <tr>
+                <th class="col-id">ID</th>
+                <th class="col-date">Miesiąc</th>
+                <th class="col-date">Rok</th>
+                <th class="col-inv">Potwierdzono</th>
+                <th class="col-name">UPO</th>
+            </tr>
+        </thead>
+        <tbody>
         {{range .JpkListData}}
-        <tr>
-            <td><a href='/jpk/view/{{.Id}}'>Zobacz</a></td>
+        <tr class="clickable-row" data-href='/jpk/view/{{.Id}}'>
             <td>{{.Id}}</td>
             <td>{{.Miesiac}}</td>
             <td>{{.Rok}}</td>
-            <td>{{.ConfirmedAt}}</td>
-            <td>{{.UPO}}</td>
+            <td>
+                {{if .ConfirmedAt}}
+                    {{.ConfirmedAt.Format "2006-01-02"}}
+                {{else}}
+                    <span style="color:#7f8c8d;">-</span>
+                {{end}}
+            </td>
+            <td>
+                {{if .UPO}}
+                    <span style="font-family:monospace;">{{.UPO}}</span>
+                {{else}}
+                    -
+                {{end}}
+            </td>
         </tr>
         {{end}}
+        </tbody>
     </table>
+    
+    <script src="/static/js/lists.js" type="text/javascript"></script>
+
     {{else}}
         <p>Nie ma jeszcze plików JPK.</p>
     {{end}}
