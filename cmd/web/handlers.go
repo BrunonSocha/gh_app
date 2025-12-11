@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 
 	"app.greyhouse.es/internal/models"
+	"app.greyhouse.es/internal/validator"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -21,7 +23,7 @@ type addInvoiceForm struct {
 	Podatek float64
 	Data time.Time
 	Inv_type models.InvoiceType
-	FieldErrors map[string]string
+	validator.Validator
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +63,7 @@ func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	data, err := time.Parse("2006-01-02",r.PostForm.Get("data"))
+	data, err := time.Parse("2006-02-01",r.PostForm.Get("data"))
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -81,34 +83,17 @@ func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 		Data: data,
 		Nazwa: nazwa,
 		Inv_type: inv_type,
-		FieldErrors: make(map[string]string),
 	}
 
+	form.CheckField(validator.NotBlank(form.Nr_faktury), "nr_faktury", "Nr faktury nie może być pusty.")
+	form.CheckField(validator.NotBlank(form.NIP), "nip", "NIP nie może być pusty.")
+	form.CheckField(validator.NotBlank(form.Nazwa), "nazwa", "Nazwa firmy nie może być pusta.")
+	form.CheckField(validator.LengthNIP(form.NIP), "nip", "NIP musi mieć 10 cyfr.")
+	form.CheckField(validator.NumberNIP(form.NIP), "nip", "NIP musi składać się wyłącznie z cyfr.")
+	form.CheckField(validator.NotZero(form.Netto), "netto", "Wartość netto nie może wynosić zero.")
+	form.CheckField(validator.NotZero(form.Podatek), "podatek", "Wartość podatku nie może wynosić zero.")
 
-	if strings.TrimSpace(form.Nr_faktury) == "" {
-		form.FieldErrors["nr_faktury"] = "Numer faktury nie może być pusty."
-	}
-
-	if form.NIP == "" || len(form.NIP) != 10 {
-		form.FieldErrors["nip"] = "NIP musi mieć 10 cyfr."
-	} else if _, err := strconv.Atoi(form.NIP); err != nil {
-		form.FieldErrors["nip"] = "NIP może zawierać tylko cyfry."
-	}
-	
-	if form.Netto == 0 {
-		form.FieldErrors["netto"] = "Wartość netto nie może wynosić 0."
-	}
-	if form.Podatek == 0 {
-		form.FieldErrors["podatek"] = "Podatek nie może wynosić 0."
-	} else if form.Podatek > form.Netto {
-		form.FieldErrors["podatek"] = "Podatek nie może być wyższy niż wartość netto."
-	}
-
-	if strings.TrimSpace(form.Nazwa) == "" {
-		form.FieldErrors["nazwa"] = "Nazwa kontrahenta nie może być pusta."
-	}
-
-	if len(form.FieldErrors) > 0 {
+	if !form.Valid() {
 		tmpData := app.newTemplateData(r)
 		tmpData.Form = form
 		app.render(w, http.StatusUnprocessableEntity, "add_invoice.tmpl", tmpData)
@@ -148,6 +133,16 @@ func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "view_invoice.tmpl", data)
 }
 
+func (app *application) viewAllInvoices(w http.ResponseWriter, r *http.Request) {
+	invoices, err := app.invoices.GetAll()
+	if err != nil {
+		app.serverError(w, err)
+	}
+	data := app.newTemplateData(r)
+	data.Invoices = invoices
+	app.render(w, http.StatusOK, "view_invoices.tmpl", data)
+}
+
 func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
@@ -169,6 +164,7 @@ func (app *application) jpkViewAll(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.serverError(w, err)
 	}
+	slices.Reverse(jpks)
 	data := app.newTemplateData(r)
 	data.JpkListData = jpks
 	app.render(w, http.StatusOK, "jpk_files.tmpl", data)
@@ -183,7 +179,6 @@ func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 
 	jpk, err := app.jpks.NewJpk(invoices)
 
-	// add the jpk to a newTemplateData. Create a template for displaying jpks.
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -214,4 +209,9 @@ func (app *application) jpkDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "Usunięto JPK o id %d", params)
+}
+
+func (app *application) jpkConfirm(w http.ResponseWriter, r *http.Request) {
+	// prototype for a function that will prompt for UPO and confirm the file
+	// if it's provided.
 }

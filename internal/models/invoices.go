@@ -84,6 +84,25 @@ func (m *InvoiceModel) LastMonth() ([]*Invoice, error) {
 	return invoices, err
 }
 
+func (m *InvoiceModel) GetAll() ([]*Invoice, error) {
+	stmt := "SELECT * FROM Invoices WHERE data < DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 1, 0) "
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	invoices := []*Invoice{}
+	for rows.Next() {
+		inv := &Invoice{}
+		err := rows.Scan(&inv.Id, &inv.Nip, &inv.Nr_faktury, &inv.Netto, &inv.Podatek, &inv.Data, &inv.Inv_type)
+		if err != nil {
+			return nil, err
+		}
+		invoices = append(invoices, inv)
+	}
+	
+	return invoices, nil
+}
+
 func (m *InvoiceModel) Delete(id int) (error) {
 	stmt := "DELETE FROM Invoices WHERE id = @p1"
 	row, err := m.DB.Exec(stmt, id)

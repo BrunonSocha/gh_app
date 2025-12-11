@@ -1,7 +1,7 @@
 {{define "title"}}Aktualne{{end}}
 
 {{define "main"}}
-    <h2>Faktury z zeszłego miesiąca (do obecnego JPK):</h2>
+    <h2>Faktury archiwalne:</h2>
     {{if .Invoices}}
     <table>
         <thead>
@@ -31,6 +31,6 @@
     <script src="/static/js/lists.js" type="text/javascript"></script>
 
     {{else}}
-        <p>Nie ma jeszcze faktur z tego miesiąca.</p>
+        <p>Nie ma żadnych faktur.</p>
     {{end}}
 {{end}}
