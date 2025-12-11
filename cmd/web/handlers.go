@@ -6,11 +6,23 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"app.greyhouse.es/internal/models"
 	"github.com/julienschmidt/httprouter"
 )
+
+type addInvoiceForm struct {
+	Nr_faktury string
+	NIP string
+	Nazwa string
+	Netto float64
+	Podatek float64
+	Data time.Time
+	Inv_type models.InvoiceType
+	FieldErrors map[string]string
+}
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
@@ -27,20 +39,83 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) addInvoice(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Show the form to create a new invoice.."))
+	data := app.newTemplateData(r)
+	data.Form = addInvoiceForm{}
+	app.render(w, http.StatusOK, "add_invoice.tmpl", data)
 }
 
 func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 
-	nr_faktury := "faktura 1488"
-	nip := "1488148888"
-	netto := 100
-	podatek := 23
-	data := time.Now().AddDate(0, -1, 0)
-	inv_type := models.PurchaseInvoice
-	nazwa := "Nucysfera sp. z o.o."
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	netto, err := strconv.ParseFloat(r.PostForm.Get("netto"), 64)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	podatek, err := strconv.ParseFloat(r.PostForm.Get("podatek"), 64)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	data, err := time.Parse("2006-01-02",r.PostForm.Get("data"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	var inv_type models.InvoiceType
+	if r.PostForm.Get("type") == "PURC" {
+		inv_type = models.PurchaseInvoice
+	} else {
+		inv_type = models.SaleInvoice
+	}
+	nazwa := r.PostForm.Get("nazwa")
+	form := addInvoiceForm {
+		Nr_faktury: r.PostForm.Get("nr_faktury"),
+		NIP: strings.ReplaceAll(strings.ReplaceAll(r.PostForm.Get("nip"), "-", ""), " ", ""),
+		Netto: netto,
+		Podatek: podatek,
+		Data: data,
+		Nazwa: nazwa,
+		Inv_type: inv_type,
+		FieldErrors: make(map[string]string),
+	}
 
-	id, err := app.invoices.Insert(nip, nr_faktury, float64(netto), float64(podatek), data, inv_type, nazwa)
+
+	if strings.TrimSpace(form.Nr_faktury) == "" {
+		form.FieldErrors["nr_faktury"] = "Numer faktury nie może być pusty."
+	}
+
+	if form.NIP == "" || len(form.NIP) != 10 {
+		form.FieldErrors["nip"] = "NIP musi mieć 10 cyfr."
+	} else if _, err := strconv.Atoi(form.NIP); err != nil {
+		form.FieldErrors["nip"] = "NIP może zawierać tylko cyfry."
+	}
+	
+	if form.Netto == 0 {
+		form.FieldErrors["netto"] = "Wartość netto nie może wynosić 0."
+	}
+	if form.Podatek == 0 {
+		form.FieldErrors["podatek"] = "Podatek nie może wynosić 0."
+	} else if form.Podatek > form.Netto {
+		form.FieldErrors["podatek"] = "Podatek nie może być wyższy niż wartość netto."
+	}
+
+	if strings.TrimSpace(form.Nazwa) == "" {
+		form.FieldErrors["nazwa"] = "Nazwa kontrahenta nie może być pusta."
+	}
+
+	if len(form.FieldErrors) > 0 {
+		tmpData := app.newTemplateData(r)
+		tmpData.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "add_invoice.tmpl", tmpData)
+		return
+	}
+
+	id, err := app.invoices.Insert(form.NIP, form.Nr_faktury, float64(form.Netto), float64(form.Podatek), form.Data, form.Inv_type, form.Nazwa)
 	if err != nil {
 		app.serverError(w, err)
 		return

@@ -14,6 +14,7 @@ type templateData struct {
 	Jpk *models.JPK
 	JpkMetadata *models.JPKMetadata
 	JpkListData []*models.JPKMetadata
+	Form any
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

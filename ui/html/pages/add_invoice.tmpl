@@ -1,0 +1,78 @@
+{{define "title"}}Nowa faktura{{end}}
+
+{{define "main"}}
+<div class="form-wrapper">
+    <h2>Dodaj nową fakturę</h2>
+    
+    <form action='/addinvoice' method='POST' class="form-card">
+        <div class="form-group">
+            <label>Nr faktury</label>
+            <input type='text' name='nr_faktury' placeholder="np. FV/2025/11/01" value='{{.Form.Nr_faktury}}'>
+            {{with .Form.FieldErrors.nr_faktury}}
+                <label class="error">{{.}}</label>
+            {{end}}
+        </div>
+        
+        <div class="form-group">
+            <label>NIP</label>
+            <input type='text' name='nip' placeholder="0000000000" value='{{.Form.NIP}}'>
+            {{with .Form.FieldErrors.nip}}
+                <label class="error">{{.}}</label>
+            {{end}}
+        </div>
+        
+        <div class="form-group">
+            <label>Nazwa firmy</label>
+            <input type='text' name='nazwa' placeholder="Pełna nazwa kontrahenta" value='{{.Form.Nazwa}}'>
+            {{with .Form.FieldErrors.nazwa}}
+                <label class="error">{{.}}</label>
+            {{end}}
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>Netto (PLN)</label>
+                <input type='number' name='netto' step='0.01' placeholder="0.00" value='{{.Form.Netto}}'>
+                {{with .Form.FieldErrors.netto}}
+                    <label class="error">{{.}}</label>
+                {{end}}
+            </div>
+            
+            <div class="form-group">
+                <label>Podatek (PLN)</label>
+                <input type='number' name='podatek' step='0.01' placeholder="0.00" value='{{.Form.Podatek}}'>
+                {{with .Form.FieldErrors.podatek}}
+                    <label class="error">{{.}}</label>
+                {{end}}
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>Data wystawienia</label>
+                <input type='date' id="dateInput" name='data' value='{{.Form.Data}}'>
+                {{with .Form.FieldErrors.data}}
+                    <label class="error">{{.}}</label>
+                {{end}}
+            </div>
+            
+            <div class="form-group">
+                <label for='type'>Typ faktury</label>
+                <select name='type'>
+                    <option value='PURC'>Zakup (Koszt)</option>
+                    <option value='SALE'>Sprzedaż (Przychód)</option>
+                </select>
+                {{with .Form.FieldErrors.type}}
+                    <label class="error">{{.}}</label>
+                {{end}}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <input type='submit' value='Dodaj fakturę' class="btn primary">
+        </div>
+    </form>
+</div>
+
+<script src='/static/js/add_invoice.js' type='text/javascript'></script>
+{{end}}
