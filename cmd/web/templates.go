@@ -10,6 +10,7 @@ import (
 type templateData struct {
 	Invoice *models.Invoice
 	Invoices []*models.Invoice
+	InvDeletable bool
 	CompanyName string
 	Jpk *models.JPK
 	JpkMetadata *models.JPKMetadata

@@ -140,7 +140,7 @@
 
     <div class="actions-footer">
         {{if not .JpkMetadata.ConfirmedAt}}
-            <form action="/jpk/delete/{{.JpkMetadata.Id}}" method="DELETE" style="display:inline;">
+            <form action="/jpk/delete/{{.JpkMetadata.Id}}" method="POST" style="display:inline;">
                 <button type="submit" class="btn danger">Usuń wersję roboczą</button>
             </form>
             <a href="/jpk/download/{{.JpkMetadata.Id}}" class="btn primary">Pobierz XML</a>

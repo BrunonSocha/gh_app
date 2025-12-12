@@ -110,16 +110,17 @@ func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
+	// add current date to the newTemplateData constructor, check against it whether to display the delete button. 
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil || id < 1 {
 		app.notFound(w)
 		return
 	}
-
 	inv, cname, err := app.invoices.Get(id)
 	data := app.newTemplateData(r)
 	data.Invoice = inv
+	data.InvDeletable = inv.IsPreviousMonth()
 	data.CompanyName = cname
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
@@ -141,6 +142,20 @@ func (app *application) viewAllInvoices(w http.ResponseWriter, r *http.Request) 
 	data := app.newTemplateData(r)
 	data.Invoices = invoices
 	app.render(w, http.StatusOK, "view_invoices.tmpl", data)
+}
+
+func (app *application) deleteInvoice(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil {
+		app.serverError(w, err)
+	}
+	err = app.invoices.Delete(id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
@@ -208,7 +223,7 @@ func (app *application) jpkDelete(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	fmt.Fprintf(w, "Usunięto JPK o id %d", params)
+	http.Redirect(w, r, "/jpk/viewall", http.StatusSeeOther)
 }
 
 func (app *application) jpkConfirm(w http.ResponseWriter, r *http.Request) {

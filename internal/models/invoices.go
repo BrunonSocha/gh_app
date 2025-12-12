@@ -119,3 +119,13 @@ func (m *InvoiceModel) Delete(id int) (error) {
 	return nil
 }
 
+func (inv Invoice) IsPreviousMonth() bool {
+	now := time.Now()
+
+	before := now.AddDate(0, -1, -now.Day()+1)
+	after := before.AddDate(0, 1, 0)
+	if inv.Data.Before(before) || inv.Data.After(after) {
+		return false
+	}
+	return true
+}
