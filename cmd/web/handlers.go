@@ -277,9 +277,16 @@ func (app *application) jpkConfirm(w http.ResponseWriter, r *http.Request) {
 	}
 	form.CheckField(validator.NotBlank(form.UPO), "upo", "UPO nie może być puste.")
 	if !form.Valid() {
+		jpk, metadata, err := app.jpks.Get(id)
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
 		data := app.newTemplateData(r)
+		data.Jpk = jpk
+		data.JpkMetadata = metadata
 		data.Form = form
-		http.Redirect(w, r, fmt.Sprintf("/jpk/view/%d", id), http.StatusSeeOther)
+		app.render(w, http.StatusUnprocessableEntity, "view_jpk.tmpl", data)
 		return
 	}
 	err = app.jpks.Confirm(id, form.UPO)
