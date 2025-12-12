@@ -21,7 +21,7 @@
             </div>
             <div class="meta-item">
                 <span class="label">Wygenerowane:</span>
-                <span class="value">{{.Jpk.Naglowek.DataWytworzeniaJPK}}</span>
+                <span class="value">{{.JpkMetadata.GeneratedAt.Format "2006-01-02 15:04"}}</span>
             </div>
             {{if .JpkMetadata.UPO}}
             <div class="meta-item">

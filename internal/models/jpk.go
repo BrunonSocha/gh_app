@@ -15,6 +15,7 @@ type JPKModel struct {
 type JPKMetadata struct {
 	Id int
 	ConfirmedAt *time.Time
+	GeneratedAt *time.Time
 	UPO *string
 	Rok int
 	Miesiac int
@@ -273,11 +274,11 @@ func (m *JPKModel) InsertDB(jpk *JPK, jpk_data string) (int, error) {
 }
 
 func (m *JPKModel) Get(id int) (*JPK, *JPKMetadata, error){
-	stmt := "SELECT xml_content, id, confirmed_at, upo_reference_number FROM JpkFiles WHERE id = @p1"
+	stmt := "SELECT xml_content, id, generated_at, confirmed_at, upo_reference_number FROM JpkFiles WHERE id = @p1"
 	row := m.DB.QueryRow(stmt, id)
 	var byteArray []byte
 	jpkmetadata := &JPKMetadata{}
-	err := row.Scan(&byteArray, &jpkmetadata.Id, &jpkmetadata.ConfirmedAt, &jpkmetadata.UPO)
+	err := row.Scan(&byteArray, &jpkmetadata.Id, &jpkmetadata.GeneratedAt, &jpkmetadata.ConfirmedAt, &jpkmetadata.UPO)
 	if err != nil || len(byteArray) == 0{
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil, ErrNoRecord
