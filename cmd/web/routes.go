@@ -30,7 +30,8 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/viewinvoices", app.viewAllInvoices)
 	router.HandlerFunc(http.MethodPost, "/deleteinvoice/:id", app.deleteInvoice)
 	router.HandlerFunc(http.MethodGet, "/jpk/download/:id", app.jpkDownload)
-	
+	router.HandlerFunc(http.MethodPost, "/jpk/confirm/:id", app.jpkConfirm)
+
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 	return standard.Then(router)
 }

@@ -27,6 +27,11 @@ type addInvoiceForm struct {
 	validator.Validator
 }
 
+type confirmJpkForm struct {
+	UPO string
+	validator.Validator
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 	invoices, err := app.invoices.LastMonth()
@@ -256,6 +261,36 @@ func (app *application) jpkDownload(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) jpkConfirm(w http.ResponseWriter, r *http.Request) {
-	// prototype for a function that will prompt for UPO and confirm the file
-	// if it's provided.
+	params := httprouter.ParamsFromContext(r.Context())
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	err = r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	form := confirmJpkForm{
+		UPO: r.PostForm.Get("upo"),
+	}
+	form.CheckField(validator.NotBlank(form.UPO), "upo", "UPO nie może być puste.")
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		http.Redirect(w, r, fmt.Sprintf("/jpk/view/%d", id), http.StatusSeeOther)
+		return
+	}
+	err = app.jpks.Confirm(id, form.UPO)
+	
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	http.Redirect(w, r, fmt.Sprintf("/jpk/view/%d", id), http.StatusSeeOther)
 }

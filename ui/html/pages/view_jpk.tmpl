@@ -144,7 +144,15 @@
                 <button type="submit" class="btn danger">Usuń wersję roboczą</button>
             </form>
             <a href="/jpk/download/{{.JpkMetadata.Id}}" class="btn primary">Pobierz XML</a>
-            <button onclick="openConfirmModal({{.JpkMetadata.Id}})" class="btn success">Zatwierdź</button>
+            {{if .Form}}
+                {{with .Form.FieldErrors.upo}}
+                    <label class="error">{{.}}</label>
+                {{end}}
+            {{end}}
+            <form action="/jpk/confirm/{{.JpkMetadata.Id}}" method="POST" style="display:inline;">
+            <input type='text' name='upo' placeholder="0000000000">
+                <button type="submit" class="btn success">Zatwierdź</button>
+            </form>
         {{else}}
             <a href="/jpk/download/{{.JpkMetadata.Id}}" class="btn secondary">Download Copy</a>
         {{end}}

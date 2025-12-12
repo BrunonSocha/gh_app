@@ -318,9 +318,9 @@ func (m *JPKModel) GetAll() ([]*JPKMetadata, error) {
 	return jpkfiles, nil
 }
 
-func (m *JPKModel) Confirm(id int) (error) {
-	stmt := "UPDATE JpkFiles SET confirmed_at = @p1 WHERE id = @p2"
-	rows, err := m.DB.Exec(stmt, time.Now(), id)
+func (m *JPKModel) Confirm(id int, upo string) (error) {
+	stmt := "UPDATE JpkFiles SET confirmed_at = @p1, upo_reference_number = @p2 WHERE id = @p3"
+	rows, err := m.DB.Exec(stmt, time.Now(), upo, id)
 	if err != nil {
 		return err
 	}
