@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -63,7 +64,7 @@ func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	data, err := time.Parse("2006-02-01",r.PostForm.Get("data"))
+	data, err := time.Parse("2006-01-02",r.PostForm.Get("data"))
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -148,7 +149,8 @@ func (app *application) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
-		app.serverError(w, err)
+		app.notFound(w)
+		return
 	}
 	err = app.invoices.Delete(id)
 	if err != nil {
@@ -218,12 +220,39 @@ func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 func (app *application) jpkDelete(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil {
+		app.notFound(w)
+		return
+	}
 	err = app.jpks.Delete(id)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 	http.Redirect(w, r, "/jpk/viewall", http.StatusSeeOther)
+}
+
+func (app *application) jpkDownload(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	fileContent, err := app.jpks.GetContent(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"jpk_v7m_%d.xml\"", id))
+	w.Header().Set("Content-Type", "application/xml")
+	w.Header().Set("Content-Length", strconv.Itoa(len(fileContent)))
+
+	http.ServeContent(w, r, "jpk.xml", time.Now(), bytes.NewReader(fileContent))
 }
 
 func (app *application) jpkConfirm(w http.ResponseWriter, r *http.Request) {

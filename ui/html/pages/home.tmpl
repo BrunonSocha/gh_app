@@ -3,6 +3,9 @@
 {{define "main"}}
     <h2>Faktury z zeszłego miesiąca (do obecnego JPK):</h2>
     {{if .Invoices}}
+    <form action="/jpk/create" method="POST" style="display:inline;">
+                <button type="submit" class="btn success">Generuj JPK</button>
+    </form>
     <table>
         <thead>
             <tr>

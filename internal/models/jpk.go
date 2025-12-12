@@ -350,3 +350,20 @@ func (m *JPKModel) Delete(id int) (error) {
 	}
 	return nil
 }
+
+func (m *JPKModel) GetContent(id int) ([]byte, error) {
+	stmt := "SELECT xml_content FROM JpkFiles WHERE id = @p1"
+	var content []byte
+	err := m.DB.QueryRow(stmt, id).Scan(&content)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoRecord
+		}
+		return nil, err
+	}
+	if len(content) == 0 {
+		return nil, errors.New("No file content.")
+	}
+
+	return content, nil
+}
