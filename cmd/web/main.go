@@ -10,8 +10,11 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"time"
 
 	"app.greyhouse.es/internal/models"
+	"github.com/alexedwards/scs/mssqlstore"
+	"github.com/alexedwards/scs/v2"
 	_ "github.com/microsoft/go-mssqldb"
 )
 
@@ -22,6 +25,7 @@ type application struct {
 	invTypes *models.InvoiceType
 	templateCache map[string]*template.Template
 	jpks *models.JPKModel
+	sessionManager *scs.SessionManager
 }
 
 func main() {
@@ -46,6 +50,11 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	// session manager
+	sessionManager := scs.New()
+	sessionManager.Store = mssqlstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
+
 	// application struct instance
 	app := &application{
 		errorLog: errorLog,
@@ -53,6 +62,7 @@ func main() {
 		invoices: &models.InvoiceModel{DB: db},
 		templateCache: templateCache,
 		jpks: &models.JPKModel{DB: db},
+		sessionManager: sessionManager,
 	}
 
 	// our own server

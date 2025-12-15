@@ -139,24 +139,29 @@
     </div>
 
     <div class="actions-footer">
-        {{if not .JpkMetadata.ConfirmedAt}}
-            <form action="/jpk/delete/{{.JpkMetadata.Id}}" method="POST" style="display:inline;">
+    {{if not .JpkMetadata.ConfirmedAt}}
+        <div class="actions-group">
+            <form action="/jpk/delete/{{.JpkMetadata.Id}}" method="POST">
                 <button type="submit" class="btn danger">Usuń wersję roboczą</button>
             </form>
             <a href="/jpk/download/{{.JpkMetadata.Id}}" class="btn primary">Pobierz XML</a>
+        </div>
+
+        <div class="confirm-wrapper">
             {{if .Form}}
                 {{with .Form.FieldErrors.upo}}
-                    <label class="error">{{.}}</label>
+                    <div class="popover-error">{{.}}</div>
                 {{end}}
             {{end}}
-            <form action="/jpk/confirm/{{.JpkMetadata.Id}}" method="POST" style="display:inline;">
-            <input type='text' name='upo' placeholder="0000000000">
+            <form action="/jpk/confirm/{{.JpkMetadata.Id}}" method="POST" class="input-group">
+                <input type='text' name='upo' placeholder="Numer referencyjny UPO" value='{{if .Form}}{{.Form.UPO}}{{end}}'>
                 <button type="submit" class="btn success">Zatwierdź</button>
             </form>
-        {{else}}
-            <a href="/jpk/download/{{.JpkMetadata.Id}}" class="btn secondary">Download Copy</a>
-        {{end}}
-    </div>
-
+        </div>
+    {{else}}
+        <div class="actions-group">
+            <a href="/jpk/download/{{.JpkMetadata.Id}}" class="btn secondary">Pobierz kopię</a>
+        </div>
+    {{end}}
 </div>
 {{end}}

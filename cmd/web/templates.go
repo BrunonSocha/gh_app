@@ -16,6 +16,7 @@ type templateData struct {
 	JpkMetadata *models.JPKMetadata
 	JpkListData []*models.JPKMetadata
 	Form any
+	Flash string
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

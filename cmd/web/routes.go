@@ -18,6 +18,8 @@ func (app *application) routes() http.Handler {
 
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
+	// sessions
+
 	// handling functions
 	router.HandlerFunc(http.MethodGet, "/", app.home)
 	router.HandlerFunc(http.MethodGet, "/addinvoice", app.addInvoice)
@@ -32,7 +34,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/jpk/download/:id", app.jpkDownload)
 	router.HandlerFunc(http.MethodPost, "/jpk/confirm/:id", app.jpkConfirm)
 
-	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
+	standard := alice.New(app.sessionManager.LoadAndSave, app.recoverPanic, app.logRequest, secureHeaders)
 	return standard.Then(router)
 }
 

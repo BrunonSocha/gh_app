@@ -112,6 +112,8 @@ func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.sessionManager.Put(r.Context(), "flash", "Dodano fakturę.")
+
 	http.Redirect(w, r, fmt.Sprintf("/viewinvoice/%d", id), http.StatusSeeOther)
 }
 
@@ -162,6 +164,9 @@ func (app *application) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Usunięto fakturę.")
+	
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -217,6 +222,9 @@ func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
+	
+	app.sessionManager.Put(r.Context(), "flash", "Wygenerowano JPK.")
+
 	// redirect to view jpk.
 	http.Redirect(w, r, fmt.Sprintf("/jpk/view/%d", id), http.StatusSeeOther)
 
@@ -234,6 +242,9 @@ func (app *application) jpkDelete(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Usunięto wersję roboczą JPK.")
+
 	http.Redirect(w, r, "/jpk/viewall", http.StatusSeeOther)
 }
 
@@ -299,5 +310,6 @@ func (app *application) jpkConfirm(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	app.sessionManager.Put(r.Context(), "flash", "Zatwierdzono JPK.")
 	http.Redirect(w, r, fmt.Sprintf("/jpk/view/%d", id), http.StatusSeeOther)
 }

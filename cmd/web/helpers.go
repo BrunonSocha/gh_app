@@ -46,5 +46,7 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 
 func (app *application) newTemplateData(r *http.Request) *templateData {
 	// for if we need to always pass in some data to the template
-	return &templateData{}
+	return &templateData{
+		Flash: app.sessionManager.PopString(r.Context(), "flash"),
+	}
 }
