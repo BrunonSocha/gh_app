@@ -19,12 +19,12 @@ import (
 )
 
 type application struct {
-	errorLog *log.Logger
-	infoLog *log.Logger
-	invoices *models.InvoiceModel
-	invTypes *models.InvoiceType
-	templateCache map[string]*template.Template
-	jpks *models.JPKModel
+	errorLog       *log.Logger
+	infoLog        *log.Logger
+	invoices       *models.InvoiceModel
+	invTypes       *models.InvoiceType
+	templateCache  map[string]*template.Template
+	jpks           *models.JPKModel
 	sessionManager *scs.SessionManager
 }
 
@@ -38,7 +38,7 @@ func main() {
 	// creating loggers
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
-	
+
 	db, err := openDB(*dsn)
 	if err != nil {
 		errorLog.Fatal(err)
@@ -57,19 +57,19 @@ func main() {
 
 	// application struct instance
 	app := &application{
-		errorLog: errorLog,
-		infoLog: infoLog,
-		invoices: &models.InvoiceModel{DB: db},
-		templateCache: templateCache,
-		jpks: &models.JPKModel{DB: db},
+		errorLog:       errorLog,
+		infoLog:        infoLog,
+		invoices:       &models.InvoiceModel{DB: db},
+		templateCache:  templateCache,
+		jpks:           &models.JPKModel{DB: db},
 		sessionManager: sessionManager,
 	}
 
 	// our own server
 	srv := &http.Server{
-		Addr: *addr,
+		Addr:     *addr,
 		ErrorLog: errorLog,
-		Handler: app.routes(),
+		Handler:  app.routes(),
 	}
 
 	// on run

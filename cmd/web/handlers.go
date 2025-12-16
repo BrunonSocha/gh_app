@@ -18,12 +18,12 @@ import (
 
 type addInvoiceForm struct {
 	Nr_faktury string
-	NIP string
-	Nazwa string
-	Netto float64
-	Podatek float64
-	Data time.Time
-	Inv_type models.InvoiceType
+	NIP        string
+	Nazwa      string
+	Netto      float64
+	Podatek    float64
+	Data       time.Time
+	Inv_type   models.InvoiceType
 	validator.Validator
 }
 
@@ -42,7 +42,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	data.Invoices = invoices
-	
+
 	app.render(w, http.StatusOK, "home.tmpl", data)
 }
 
@@ -69,7 +69,7 @@ func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	data, err := time.Parse("2006-01-02",r.PostForm.Get("data"))
+	data, err := time.Parse("2006-01-02", r.PostForm.Get("data"))
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -81,14 +81,14 @@ func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 		inv_type = models.SaleInvoice
 	}
 	nazwa := r.PostForm.Get("nazwa")
-	form := addInvoiceForm {
+	form := addInvoiceForm{
 		Nr_faktury: r.PostForm.Get("nr_faktury"),
-		NIP: strings.ReplaceAll(strings.ReplaceAll(r.PostForm.Get("nip"), "-", ""), " ", ""),
-		Netto: netto,
-		Podatek: podatek,
-		Data: data,
-		Nazwa: nazwa,
-		Inv_type: inv_type,
+		NIP:        strings.ReplaceAll(strings.ReplaceAll(r.PostForm.Get("nip"), "-", ""), " ", ""),
+		Netto:      netto,
+		Podatek:    podatek,
+		Data:       data,
+		Nazwa:      nazwa,
+		Inv_type:   inv_type,
 	}
 
 	form.CheckField(validator.NotBlank(form.Nr_faktury), "nr_faktury", "Nr faktury nie może być pusty.")
@@ -118,7 +118,7 @@ func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
-	// add current date to the newTemplateData constructor, check against it whether to display the delete button. 
+	// add current date to the newTemplateData constructor, check against it whether to display the delete button.
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil || id < 1 {
@@ -138,7 +138,7 @@ func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	
+
 	app.render(w, http.StatusOK, "view_invoice.tmpl", data)
 }
 
@@ -166,11 +166,11 @@ func (app *application) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.sessionManager.Put(r.Context(), "flash", "Usunięto fakturę.")
-	
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
+func (app *application) viewJpk(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
@@ -186,7 +186,7 @@ func (app *application) jpkView(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "view_jpk.tmpl", data)
 }
 
-func (app *application) jpkViewAll(w http.ResponseWriter, r *http.Request) {
+func (app *application) viewAllJpk(w http.ResponseWriter, r *http.Request) {
 	jpks, err := app.jpks.GetAll()
 	if err != nil {
 		app.serverError(w, err)
@@ -197,7 +197,7 @@ func (app *application) jpkViewAll(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "jpk_files.tmpl", data)
 }
 
-func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
+func (app *application) addJpk(w http.ResponseWriter, r *http.Request) {
 	invoices, err := app.invoices.LastMonth()
 	if err != nil {
 		app.serverError(w, err)
@@ -222,7 +222,7 @@ func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	
+
 	app.sessionManager.Put(r.Context(), "flash", "Wygenerowano JPK.")
 
 	// redirect to view jpk.
@@ -230,7 +230,7 @@ func (app *application) jpkCreate(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (app *application) jpkDelete(w http.ResponseWriter, r *http.Request) {
+func (app *application) deleteJpk(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
@@ -248,7 +248,7 @@ func (app *application) jpkDelete(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/jpk/viewall", http.StatusSeeOther)
 }
 
-func (app *application) jpkDownload(w http.ResponseWriter, r *http.Request) {
+func (app *application) downloadJpk(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
@@ -271,7 +271,7 @@ func (app *application) jpkDownload(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, "jpk.xml", time.Now(), bytes.NewReader(fileContent))
 }
 
-func (app *application) jpkConfirm(w http.ResponseWriter, r *http.Request) {
+func (app *application) confirmJpk(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
@@ -301,7 +301,7 @@ func (app *application) jpkConfirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = app.jpks.Confirm(id, form.UPO)
-	
+
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			app.notFound(w)
