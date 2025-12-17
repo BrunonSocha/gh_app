@@ -1,9 +1,11 @@
 *.xml
+tls/
 todo.md
 # --- Project Specific ---
 # Database connection secrets
 .env
 db-shell.sh
+sqlcon.sh
 
 # --- Go ---
 # Binaries and archives
