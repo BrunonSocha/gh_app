@@ -1,2 +1,36 @@
 *.xml
 todo.md
+# --- Project Specific ---
+# Database connection secrets
+.env
+db-shell.sh
+
+# --- Go ---
+# Binaries and archives
+bin/
+main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+# Test coverage
+*.out
+
+# --- SQL Server Artifacts ---
+# In case you ever pull local backups or logs into the project folder
+*.bak
+*.sql_log
+
+# --- OS / IDE ---
+# Debian/i3 specific
+.DS_Store
+Thumbs.db
+# VS Code
+.vscode/
+# JetBrains (GoLand)
+.idea/
+
+# --- Dependencies ---
+# Only ignore if you aren't using Go modules (but you should be)
+# vendor/
