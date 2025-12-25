@@ -1,13 +1,26 @@
-{{define "title"}}Logowanie{{end}}
+{{define "title"}}Login{{end}}
 
 {{define "main"}}
-    <form action="/login" method="POST">
-        <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" placeholder="Nazwa użytkownika" type="text">
-        </div>
-        <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="password" placeholder="Hasło" type="text">
-        </div>
-        <button class="btn btn-primary" type="submit">Zaloguj się</button>
-    </form>
+<form action='/user/login' method='POST' novalidate>
+    {{range .Form.NonFieldErrors}}
+        <div class='error'>{{.}}</div>
+    {{end}}
+    <div>
+        <label>Email:</label>
+        {{with .Form.FieldErrors.email}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <input type='email' name='email' value='{{.Form.Email}}'>
+    </div>
+    <div>
+        <label>Password:</label>
+        {{with .Form.FieldErrors.password}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <input type='password' name='password'>
+    </div>
+    <div>
+        <input type='submit' value='Login'>
+    </div>
+</form>
 {{end}}

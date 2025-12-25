@@ -8,15 +8,16 @@ import (
 )
 
 type templateData struct {
-	Invoice *models.Invoice
-	Invoices []*models.Invoice
-	InvDeletable bool
-	CompanyName string
-	Jpk *models.JPK
-	JpkMetadata *models.JPKMetadata
-	JpkListData []*models.JPKMetadata
-	Form any
-	Flash string
+	Invoice         *models.Invoice
+	Invoices        []*models.Invoice
+	InvDeletable    bool
+	CompanyName     string
+	Jpk             *models.JPK
+	JpkMetadata     *models.JPKMetadata
+	JpkListData     []*models.JPKMetadata
+	Form            any
+	Flash           string
+	IsAuthenticated bool
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {
@@ -47,5 +48,4 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		cache[name] = templateSet
 	}
 	return cache, nil
-} 
-
+}

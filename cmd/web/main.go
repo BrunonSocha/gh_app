@@ -26,6 +26,7 @@ type application struct {
 	invTypes       *models.InvoiceType
 	templateCache  map[string]*template.Template
 	jpks           *models.JPKModel
+	users          *models.UserModel
 	sessionManager *scs.SessionManager
 }
 
@@ -64,6 +65,7 @@ func main() {
 		invoices:       &models.InvoiceModel{DB: db},
 		templateCache:  templateCache,
 		jpks:           &models.JPKModel{DB: db},
+		users:          &models.UserModel{DB: db},
 		sessionManager: sessionManager,
 	}
 

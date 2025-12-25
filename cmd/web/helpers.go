@@ -28,9 +28,9 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 		app.serverError(w, err)
 		return
 	}
-	
+
 	// prevent sending a 200 OK on template error
-	
+
 	buf := new(bytes.Buffer)
 	err := templateSet.ExecuteTemplate(buf, "base", data)
 	if err != nil {
@@ -38,15 +38,18 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 		return
 	}
 
-
 	w.WriteHeader(status)
 
 	buf.WriteTo(w)
 }
 
 func (app *application) newTemplateData(r *http.Request) *templateData {
-	// for if we need to always pass in some data to the template
 	return &templateData{
-		Flash: app.sessionManager.PopString(r.Context(), "flash"),
+		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: app.isAuthenticated(r),
 	}
+}
+
+func (app *application) isAuthenticated(r *http.Request) bool {
+	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
 }
