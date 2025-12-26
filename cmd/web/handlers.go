@@ -36,6 +36,8 @@ type userSignupForm struct {
 	Name     string
 	Email    string
 	Password string
+	Company  string
+	Nip      string
 	validator.Validator
 }
 
@@ -343,13 +345,18 @@ func (app *application) userSignUpPost(w http.ResponseWriter, r *http.Request) {
 		Name:     r.PostForm.Get("name"),
 		Email:    r.PostForm.Get("email"),
 		Password: r.PostForm.Get("password"),
+		Company:  r.PostForm.Get("company"),
+		Nip:      r.PostForm.Get("nip"),
 	}
 
 	form.CheckField(validator.NotBlank(form.Name), "name", "Nazwa nie może być pusta")
 	form.CheckField(validator.NotBlank(form.Email), "email", "Email nie może być pusty")
 	form.CheckField(validator.NotBlank(form.Password), "password", "Hasło nie może być puste")
+	form.CheckField(validator.NotBlank(form.Nip), "nip", "NIP nie może być pusty")
+	form.CheckField(validator.NotBlank(form.Company), "company", "Nazwa firmy nie może być pusta")
 	form.CheckField(validator.Matches(form.Email, validator.EmailRegex), "email", "Email musi być poprawny")
 	form.CheckField(validator.MinChars(form.Password, 8), "password", "Hasło musi mieć min. 8 znaków")
+	form.CheckField(validator.LengthNIP(form.Nip), "nip", "NIP musi być poprawny")
 
 	if !form.Valid() {
 		data := app.newTemplateData(r)
@@ -358,10 +365,15 @@ func (app *application) userSignUpPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.users.Insert(form.Name, form.Email, form.Password)
+	err = app.users.Insert(form.Name, form.Email, form.Password, form.Company, form.Nip)
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateEmail) {
 			form.AddFieldError("email", "Email address is already in use")
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, http.StatusUnprocessableEntity, "signup.tmpl", data)
+		} else if errors.Is(err, models.ErrDuplicateNip) {
+			form.AddFieldError("nip", "NIP is already in use")
 			data := app.newTemplateData(r)
 			data.Form = form
 			app.render(w, http.StatusUnprocessableEntity, "signup.tmpl", data)

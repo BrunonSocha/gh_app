@@ -4,6 +4,7 @@
     <h2>Faktury z zeszłego miesiąca (do obecnego JPK):</h2>
     {{if .Invoices}}
     <form action="/jpk/create" method="POST" style="display:inline;">
+    <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
                 <button type="submit" class="btn success">Generuj JPK</button>
     </form>
     <table>

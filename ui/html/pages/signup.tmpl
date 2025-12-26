@@ -2,6 +2,7 @@
 
 {{define "main"}}
     <form action='/user/signup' method='POST' novalidate>
+    <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
         <div>
             <label>Name:</label>
             {{with .Form.FieldErrors.name}}
@@ -22,6 +23,20 @@
                 <label class='error'>{{.}}</label>
             {{end}}
             <input type='password' name='password'>
+        </div>
+        <div>
+            <label>Company name:</label>
+            {{with .Form.FieldErrors.company}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' name='company'>
+        </div>
+        <div>
+            <label>NIP:</label>
+            {{with .Form.FieldErrors.nip}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' name='nip'>
         </div>
         <div>
             <input type='submit' value='Signup'>

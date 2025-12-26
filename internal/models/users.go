@@ -22,14 +22,24 @@ type UserModel struct {
 	DB *sql.DB
 }
 
-func (m *UserModel) Insert(name, email, password string) error {
-	stmt := "INSERT INTO Users (name, email, hashed_password, created) values (@p1, @p2, @p3, GETDATE())"
+func (m *UserModel) Insert(name, email, password, company, nip string) error {
+	_, err := m.DB.Exec("INSERT INTO UserCompanies VALUES (@p1, @p2)", nip, company)
+	if err != nil {
+		var msSQLError *mssql.Error
+		if errors.As(err, &msSQLError) {
+			if msSQLError.Number == 1062 && strings.Contains(msSQLError.Message, "users_nc_nip") {
+				return ErrDuplicateNip
+			}
+		}
+		return err
+	}
+	stmt := "INSERT INTO Users (name, email, hashed_password, nip, created) values (@p1, @p2, @p3, @p4, GETDATE())"
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
 		return err
 	}
-	_, err = m.DB.Exec(stmt, name, email, hashedPassword)
+	_, err = m.DB.Exec(stmt, name, email, hashedPassword, nip)
 	if err != nil {
 		var msSQLError *mssql.Error
 		if errors.As(err, &msSQLError) {
@@ -70,5 +80,8 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 }
 
 func (m *UserModel) Exists(id int) (bool, error) {
-	return false, ErrInvalidCredentials
+	var exists bool
+	stmt := "SELECT CASE WHEN EXISTS(SELECT 1 FROM users WHERE id = @p1) THEN 1 ELSE 0 END"
+	err := m.DB.QueryRow(stmt, id).Scan(&exists)
+	return exists, err
 }

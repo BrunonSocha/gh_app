@@ -142,6 +142,7 @@
     {{if not .JpkMetadata.ConfirmedAt}}
         <div class="actions-group">
             <form action="/jpk/delete/{{.JpkMetadata.Id}}" method="POST">
+            <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
                 <button type="submit" class="btn danger">Usuń wersję roboczą</button>
             </form>
             <a href="/jpk/download/{{.JpkMetadata.Id}}" class="btn primary">Pobierz XML</a>
@@ -154,6 +155,7 @@
                 {{end}}
             {{end}}
             <form action="/jpk/confirm/{{.JpkMetadata.Id}}" method="POST" class="input-group">
+            <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
                 <input type='text' name='upo' placeholder="Numer referencyjny UPO" value='{{if .Form}}{{.Form.UPO}}{{end}}'>
                 <button type="submit" class="btn success">Zatwierdź</button>
             </form>

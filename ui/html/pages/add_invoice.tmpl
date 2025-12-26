@@ -5,7 +5,9 @@
     <h2>Dodaj nową fakturę</h2>
     
     <form action='/addinvoice' method='POST' class="form-card">
+    <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
         <div class="form-group">
+        <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
             <label>Nr faktury</label>
             <input type='text' name='nr_faktury' placeholder="np. FV/2025/11/01" value='{{.Form.Nr_faktury}}'>
             {{with .Form.FieldErrors.nr_faktury}}

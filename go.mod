@@ -10,6 +10,7 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/justinas/alice v1.2.0 // indirect
+	github.com/justinas/nosurf v1.2.0 // indirect
 	github.com/microsoft/go-mssqldb v1.9.4 // indirect
 	golang.org/x/crypto v0.46.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
