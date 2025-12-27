@@ -27,7 +27,7 @@ func (m *UserModel) Insert(name, email, password, company, nip string) error {
 	if err != nil {
 		var msSQLError *mssql.Error
 		if errors.As(err, &msSQLError) {
-			if msSQLError.Number == 1062 && strings.Contains(msSQLError.Message, "users_nc_nip") {
+			if msSQLError.Number == 2627 || msSQLError.Number == 2601 {
 				return ErrDuplicateNip
 			}
 		}
@@ -43,7 +43,7 @@ func (m *UserModel) Insert(name, email, password, company, nip string) error {
 	if err != nil {
 		var msSQLError *mssql.Error
 		if errors.As(err, &msSQLError) {
-			if msSQLError.Number == 1062 && strings.Contains(msSQLError.Message, "users_nc_email") {
+			if (msSQLError.Number == 2627 || msSQLError.Number == 2601) && strings.Contains(msSQLError.Message, "users_nc_email") {
 				return ErrDuplicateEmail
 			}
 		}

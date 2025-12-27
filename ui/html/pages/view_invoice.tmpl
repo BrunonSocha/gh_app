@@ -43,7 +43,7 @@
     </div>
     {{ if $.InvDeletable}}
             <form action="/deleteinvoice/{{.Id}}" method="POST" style="display:inline;">
-            <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
+            <input type='hidden' name='csrf_token' value='{{$.CSRFToken}}'>
                 <button type="submit" class="btn danger">Usuń fakturę</button>
             </form>
     {{end}}

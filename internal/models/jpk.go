@@ -13,76 +13,76 @@ type JPKModel struct {
 }
 
 type JPKMetadata struct {
-	Id int
+	Id          int
 	ConfirmedAt *time.Time
 	GeneratedAt *time.Time
-	UPO *string
-	Rok int
-	Miesiac int
+	UPO         *string
+	Rok         int
+	Miesiac     int
 }
 
 type JPK struct {
-	XMLName xml.Name `xml:JPK`
-	XMLTypes string `xml:"xmlns:etd,attr"`
-	XMLSchema string `xml:"xmlns:xsi,attr"`
-	XMLPattern string `xml:"xmlns,attr"`
-	Naglowek NaglowekJPK `xml:"Naglowek"`
-	Podmiot1 Podmiot1 `xml:"Podmiot1"`
-	Deklaracja Deklaracja `xml:"Deklaracja"`
-	Ewidencja Ewidencja `xml:"Ewidencja"`
+	XMLName    xml.Name    `xml:JPK`
+	XMLTypes   string      `xml:"xmlns:etd,attr"`
+	XMLSchema  string      `xml:"xmlns:xsi,attr"`
+	XMLPattern string      `xml:"xmlns,attr"`
+	Naglowek   NaglowekJPK `xml:"Naglowek"`
+	Podmiot1   Podmiot1    `xml:"Podmiot1"`
+	Deklaracja Deklaracja  `xml:"Deklaracja"`
+	Ewidencja  Ewidencja   `xml:"Ewidencja"`
 }
 
 type NaglowekJPK struct {
-	KodFormularza KodFormularza `xml:"KodFormularza"`
-	WariantFormularza int `xml:"WariantFormularza"`
-	DataWytworzeniaJPK string `xml:"DataWytworzeniaJPK"`
-	NazwaSystemu string `xml:"NazwaSystemu"`
-	CelZlozenia CelZlozenia `xml:"CelZlozenia"`
-	KodUrzedu int `xml:"KodUrzedu"`
-	Rok int `xml:"Rok"`
-	Miesiac int `xml:"Miesiac"`
+	KodFormularza      KodFormularza `xml:"KodFormularza"`
+	WariantFormularza  int           `xml:"WariantFormularza"`
+	DataWytworzeniaJPK string        `xml:"DataWytworzeniaJPK"`
+	NazwaSystemu       string        `xml:"NazwaSystemu"`
+	CelZlozenia        CelZlozenia   `xml:"CelZlozenia"`
+	KodUrzedu          int           `xml:"KodUrzedu"`
+	Rok                int           `xml:"Rok"`
+	Miesiac            int           `xml:"Miesiac"`
 }
 
 type CelZlozenia struct {
 	Poz string `xml:"poz,attr"`
-	Cel int `xml:",chardata"`
+	Cel int    `xml:",chardata"`
 }
 
 type KodFormularza struct {
 	KodSystemowy string `xml:"kodSystemowy,attr"`
 	WersjaSchemy string `xml:"wersjaSchemy,attr"`
-	Kod string `xml:",chardata"`
+	Kod          string `xml:",chardata"`
 }
 
 type Podmiot1 struct {
-	Rola string `xml:"rola,attr"`
+	Rola             string           `xml:"rola,attr"`
 	OsobaNiefizyczna OsobaNiefizyczna `xml:"OsobaNiefizyczna"`
 }
 
 type OsobaNiefizyczna struct {
-	NIP string `xml:"NIP"`
+	NIP        string `xml:"NIP"`
 	PelnaNazwa string `xml:"PelnaNazwa"`
-	Email string `xml:"Email"`
-	Telefon string `xml:"Telefon"`
+	Email      string `xml:"Email"`
+	Telefon    string `xml:"Telefon"`
 }
 
 type Deklaracja struct {
-	Naglowek NaglowekDekl `xml:"Naglowek"`
+	Naglowek           NaglowekDekl       `xml:"Naglowek"`
 	PozycjeSzczegolowe PozycjeSzczegolowe `xml:"PozycjeSzczegolowe"`
-	Pouczenia int `xml:"Pouczenia"`
+	Pouczenia          int                `xml:"Pouczenia"`
 }
 
 type NaglowekDekl struct {
-	KodFormularzaDekl KodFormularzaDekl `xml:"KodFormularzaDekl"`
-	WariantFormularzaDekl int `xml:"WariantFormularzaDekl"`
+	KodFormularzaDekl     KodFormularzaDekl `xml:"KodFormularzaDekl"`
+	WariantFormularzaDekl int               `xml:"WariantFormularzaDekl"`
 }
 
 type KodFormularzaDekl struct {
-	KodSystemowy string `xml:"kodSystemowy,attr"`
-	KodPodatku string `xml:"kodPodatku,attr"`
+	KodSystemowy       string `xml:"kodSystemowy,attr"`
+	KodPodatku         string `xml:"kodPodatku,attr"`
 	RodzajZobowiazania string `xml:"rodzajZobowiazania,attr"`
-	WersjaSchemy string `xml:"wersjaSchemy,attr"`
-	Kod string `xml:",chardata"`
+	WersjaSchemy       string `xml:"wersjaSchemy,attr"`
+	Kod                string `xml:",chardata"`
 }
 
 type PozycjeSzczegolowe struct {
@@ -101,41 +101,41 @@ type PozycjeSzczegolowe struct {
 
 type Ewidencja struct {
 	SprzedazWiersz []SprzedazWiersz `xml:"SprzedazWiersz"`
-	SprzedazCtrl SprzedazCtrl `xml:"SprzedazCtrl"`
-	ZakupWiersz []ZakupWiersz `xml:"ZakupWiersz"`
-	ZakupCtrl ZakupCtrl `xml:"ZakupCtrl"`
+	SprzedazCtrl   SprzedazCtrl     `xml:"SprzedazCtrl"`
+	ZakupWiersz    []ZakupWiersz    `xml:"ZakupWiersz"`
+	ZakupCtrl      ZakupCtrl        `xml:"ZakupCtrl"`
 }
 
 type SprzedazWiersz struct {
-	LpSprzedazy int `xml:"LpSprzedazy"`
-	KodKrajuNadaniaTIN string `xml:"KodKrajuNadaniaTIN"`
-	NrKontrahenta string `xml:"NrKontrahenta"`
-	NazwaKontrahenta string `xml:"NazwaKontrahenta"`
-	DowodSprzedazy string `xml:"DowodSprzedazy"`
-	DataWystawienia string `xml:"DataWystawienia"`
-	K_19 float64 `xml:"K_19"`
-	K_20 float64 `xml:"K_20"`
+	LpSprzedazy        int     `xml:"LpSprzedazy"`
+	KodKrajuNadaniaTIN string  `xml:"KodKrajuNadaniaTIN"`
+	NrKontrahenta      string  `xml:"NrKontrahenta"`
+	NazwaKontrahenta   string  `xml:"NazwaKontrahenta"`
+	DowodSprzedazy     string  `xml:"DowodSprzedazy"`
+	DataWystawienia    string  `xml:"DataWystawienia"`
+	K_19               float64 `xml:"K_19"`
+	K_20               float64 `xml:"K_20"`
 }
 
 type SprzedazCtrl struct {
-	LiczbaWierszySprzedazy int `xml:"LiczbaWierszySprzedazy"`
-	PodatekNalezny float64 `xml:"PodatekNalezny"`
+	LiczbaWierszySprzedazy int     `xml:"LiczbaWierszySprzedazy"`
+	PodatekNalezny         float64 `xml:"PodatekNalezny"`
 }
 
 type ZakupWiersz struct {
-	LpZakupu int `xml:"LpZakupu"`
-	KodKrajuNadaniaTIN string `xml:"KodKrajuNadaniaTIN"`
-	NrDostawcy string `xml:"NrDostawcy"`
-	NazwaDostawcy string `xml:"NazwaDostawcy"`
-	DowodZakupu string `xml:"DowodZakupu"`
-	DataZakupu string `xml:"DataZakupu"`
-	K_42 float64 `xml:"K_42"`
-	K_43 float64 `xml:"K_43"`
+	LpZakupu           int     `xml:"LpZakupu"`
+	KodKrajuNadaniaTIN string  `xml:"KodKrajuNadaniaTIN"`
+	NrDostawcy         string  `xml:"NrDostawcy"`
+	NazwaDostawcy      string  `xml:"NazwaDostawcy"`
+	DowodZakupu        string  `xml:"DowodZakupu"`
+	DataZakupu         string  `xml:"DataZakupu"`
+	K_42               float64 `xml:"K_42"`
+	K_43               float64 `xml:"K_43"`
 }
 
 type ZakupCtrl struct {
-	LiczbaWierszyZakupow int `xml:"LiczbaWierszyZakupow"`
-	PodatekNaliczony float64 `xml:"PodatekNaliczony"`
+	LiczbaWierszyZakupow int     `xml:"LiczbaWierszyZakupow"`
+	PodatekNaliczony     float64 `xml:"PodatekNaliczony"`
 }
 
 func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
@@ -181,53 +181,52 @@ func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
 	}
 	var p_51 int
 	var p_53 int
-	if podatekNalezny > (podatekNaliczony+float64(poprzedniVat)) {
+	if podatekNalezny > (podatekNaliczony + float64(poprzedniVat)) {
 		p_51 = int(math.Round(podatekNalezny) - (math.Round(podatekNaliczony) + float64(poprzedniVat)))
 		p_53 = 0
 	} else {
 		p_51 = 0
 		p_53 = int(math.Round(podatekNaliczony) + float64(poprzedniVat) - math.Round(podatekNalezny))
 	}
-	
 
 	jpk := &JPK{
-		XMLTypes: "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/", 
-		XMLSchema: "http://www.w3.org/2001/XMLSchema-instance",
+		XMLTypes:   "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/",
+		XMLSchema:  "http://www.w3.org/2001/XMLSchema-instance",
 		XMLPattern: "http://crd.gov.pl/wzor/2021/12/27/11148/",
 		Naglowek: NaglowekJPK{
-			KodFormularza: KodFormularza {
+			KodFormularza: KodFormularza{
 				KodSystemowy: "JPK_V7M (2)",
 				WersjaSchemy: "1-0E",
-				Kod: "JPK_VAT",
+				Kod:          "JPK_VAT",
 			},
-			WariantFormularza: 2,
+			WariantFormularza:  2,
 			DataWytworzeniaJPK: string(time.Now().Format(time.RFC3339Nano)),
-			NazwaSystemu: "Formularz uproszczony",
+			NazwaSystemu:       "Formularz uproszczony",
 			CelZlozenia: CelZlozenia{
 				Poz: "P_7",
 				Cel: 1,
 			},
 			KodUrzedu: 1210,
-			Rok: time.Now().Year(),
-			Miesiac: int(previousMonth.Month()),
+			Rok:       time.Now().Year(),
+			Miesiac:   int(previousMonth.Month()),
 		},
 		Podmiot1: Podmiot1{
 			Rola: "Podatnik",
 			OsobaNiefizyczna: OsobaNiefizyczna{
-				NIP: "6793194113",
+				NIP:        "6793194113",
 				PelnaNazwa: "Grey House sp. z o.o.",
-				Email: "info@greyhouse.es",
-				Telefon: "608415900",
+				Email:      "info@greyhouse.es",
+				Telefon:    "608415900",
 			},
 		},
-		Deklaracja: Deklaracja {
+		Deklaracja: Deklaracja{
 			Naglowek: NaglowekDekl{
-				KodFormularzaDekl: KodFormularzaDekl {
-					KodSystemowy: "VAT-7 (22)",
-					KodPodatku: "VAT",
+				KodFormularzaDekl: KodFormularzaDekl{
+					KodSystemowy:       "VAT-7 (22)",
+					KodPodatku:         "VAT",
 					RodzajZobowiazania: "Z",
-					WersjaSchemy: "1-0E",
-					Kod: "VAT-7",
+					WersjaSchemy:       "1-0E",
+					Kod:                "VAT-7",
 				},
 				WariantFormularzaDekl: 22,
 			},
@@ -250,12 +249,12 @@ func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
 			SprzedazWiersz: sprzedazWiersz,
 			SprzedazCtrl: SprzedazCtrl{
 				LiczbaWierszySprzedazy: saleCount,
-				PodatekNalezny: podatekNalezny,
+				PodatekNalezny:         math.Round(podatekNalezny*100) / 100,
 			},
 			ZakupWiersz: zakupWiersz,
 			ZakupCtrl: ZakupCtrl{
 				LiczbaWierszyZakupow: purcCount,
-				PodatekNaliczony: podatekNaliczony,
+				PodatekNaliczony:     math.Round(podatekNaliczony*100) / 100,
 			},
 		},
 	}
@@ -273,13 +272,13 @@ func (m *JPKModel) InsertDB(jpk *JPK, jpk_data string) (int, error) {
 	return resId, nil
 }
 
-func (m *JPKModel) Get(id int) (*JPK, *JPKMetadata, error){
+func (m *JPKModel) Get(id int) (*JPK, *JPKMetadata, error) {
 	stmt := "SELECT xml_content, id, generated_at, confirmed_at, upo_reference_number FROM JpkFiles WHERE id = @p1"
 	row := m.DB.QueryRow(stmt, id)
 	var byteArray []byte
 	jpkmetadata := &JPKMetadata{}
 	err := row.Scan(&byteArray, &jpkmetadata.Id, &jpkmetadata.GeneratedAt, &jpkmetadata.ConfirmedAt, &jpkmetadata.UPO)
-	if err != nil || len(byteArray) == 0{
+	if err != nil || len(byteArray) == 0 {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil, ErrNoRecord
 		} else {
@@ -319,7 +318,7 @@ func (m *JPKModel) GetAll() ([]*JPKMetadata, error) {
 	return jpkfiles, nil
 }
 
-func (m *JPKModel) Confirm(id int, upo string) (error) {
+func (m *JPKModel) Confirm(id int, upo string) error {
 	stmt := "UPDATE JpkFiles SET confirmed_at = @p1, upo_reference_number = @p2 WHERE id = @p3"
 	rows, err := m.DB.Exec(stmt, time.Now(), upo, id)
 	if err != nil {
@@ -335,7 +334,7 @@ func (m *JPKModel) Confirm(id int, upo string) (error) {
 	return nil
 }
 
-func (m *JPKModel) Delete(id int) (error) {
+func (m *JPKModel) Delete(id int) error {
 	stmt := "DELETE FROM JpkFiles WHERE id = @p1 AND confirmed_at IS NULL"
 	row, err := m.DB.Exec(stmt, id)
 	if err != nil {
@@ -344,7 +343,7 @@ func (m *JPKModel) Delete(id int) (error) {
 	rowsAff, err := row.RowsAffected()
 	if err != nil {
 		return err
-	} 
+	}
 
 	if rowsAff == 0 {
 		return ErrNoRecord

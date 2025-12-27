@@ -7,13 +7,14 @@ import (
 )
 
 type Invoice struct {
-	Id int
+	Id         int
 	Nr_faktury string
-	Nip string
-	Netto float64
-	Podatek float64
-	Data time.Time
-	Inv_type InvoiceType
+	Nip        string
+	Netto      float64
+	Podatek    float64
+	Data       time.Time
+	Inv_type   InvoiceType
+	Company    string
 }
 
 type InvoiceModel struct {
@@ -21,8 +22,9 @@ type InvoiceModel struct {
 }
 
 type InvoiceType string
+
 const (
-	SaleInvoice InvoiceType = "SALE" 
+	SaleInvoice     InvoiceType = "SALE"
 	PurchaseInvoice InvoiceType = "PURC"
 )
 
@@ -67,11 +69,10 @@ func (m *InvoiceModel) LastMonth() ([]*Invoice, error) {
 		return nil, err
 	}
 	defer rows.Close()
-
 	invoices := []*Invoice{}
 	for rows.Next() {
 		inv := &Invoice{}
-		err := rows.Scan(&inv.Id, &inv.Nip, &inv.Nr_faktury, &inv.Netto, &inv.Podatek, &inv.Data, &inv.Inv_type)
+		err := rows.Scan(&inv.Id, &inv.Nip, &inv.Nr_faktury, &inv.Netto, &inv.Podatek, &inv.Data, &inv.Inv_type, &inv.Company)
 		if err != nil {
 			return nil, err
 		}
@@ -90,20 +91,21 @@ func (m *InvoiceModel) GetAll() ([]*Invoice, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	invoices := []*Invoice{}
 	for rows.Next() {
 		inv := &Invoice{}
-		err := rows.Scan(&inv.Id, &inv.Nip, &inv.Nr_faktury, &inv.Netto, &inv.Podatek, &inv.Data, &inv.Inv_type)
+		err := rows.Scan(&inv.Id, &inv.Nip, &inv.Nr_faktury, &inv.Netto, &inv.Podatek, &inv.Data, &inv.Inv_type, &inv.Company)
 		if err != nil {
 			return nil, err
 		}
 		invoices = append(invoices, inv)
 	}
-	
+
 	return invoices, nil
 }
 
-func (m *InvoiceModel) Delete(id int) (error) {
+func (m *InvoiceModel) Delete(id int) error {
 	stmt := "DELETE FROM Invoices WHERE id = @p1"
 	row, err := m.DB.Exec(stmt, id)
 	if err != nil {
