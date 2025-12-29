@@ -48,8 +48,8 @@ type userLoginForm struct {
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-
-	invoices, err := app.invoices.LastMonth()
+	company_nip := app.getNIP(r)
+	invoices, err := app.invoices.LastMonth(company_nip)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -120,8 +120,8 @@ func (app *application) addInvoicePost(w http.ResponseWriter, r *http.Request) {
 		app.render(w, http.StatusUnprocessableEntity, "add_invoice.tmpl", tmpData)
 		return
 	}
-
-	id, err := app.invoices.Insert(form.NIP, form.Nr_faktury, float64(form.Netto), float64(form.Podatek), form.Data, form.Inv_type, form.Nazwa)
+	company_nip := app.getNIP(r)
+	id, err := app.invoices.Insert(form.NIP, form.Nr_faktury, float64(form.Netto), float64(form.Podatek), form.Data, form.Inv_type, form.Nazwa, company_nip)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -140,7 +140,8 @@ func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	inv, cname, err := app.invoices.Get(id)
+	company_nip := app.getNIP(r)
+	inv, cname, err := app.invoices.Get(id, company_nip)
 	data := app.newTemplateData(r)
 	data.Invoice = inv
 	data.InvDeletable = inv.IsPreviousMonth()
@@ -158,7 +159,8 @@ func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) viewAllInvoices(w http.ResponseWriter, r *http.Request) {
-	invoices, err := app.invoices.GetAll()
+	company_nip := app.getNIP(r)
+	invoices, err := app.invoices.GetAll(company_nip)
 	if err != nil {
 		app.serverError(w, err)
 	}
@@ -168,13 +170,14 @@ func (app *application) viewAllInvoices(w http.ResponseWriter, r *http.Request) 
 }
 
 func (app *application) deleteInvoice(w http.ResponseWriter, r *http.Request) {
+	company_nip := app.getNIP(r)
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
 		app.notFound(w)
 		return
 	}
-	err = app.invoices.Delete(id)
+	err = app.invoices.Delete(id, company_nip)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -192,8 +195,9 @@ func (app *application) viewJpk(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
+	company_nip := app.getNIP(r)
 	data := app.newTemplateData(r)
-	data.Jpk, data.JpkMetadata, err = app.jpks.Get(id)
+	data.Jpk, data.JpkMetadata, err = app.jpks.Get(id, company_nip)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -202,7 +206,8 @@ func (app *application) viewJpk(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) viewAllJpk(w http.ResponseWriter, r *http.Request) {
-	jpks, err := app.jpks.GetAll()
+	company_nip := app.getNIP(r)
+	jpks, err := app.jpks.GetAll(company_nip)
 	if err != nil {
 		app.serverError(w, err)
 	}
@@ -213,7 +218,8 @@ func (app *application) viewAllJpk(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) addJpk(w http.ResponseWriter, r *http.Request) {
-	invoices, err := app.invoices.LastMonth()
+	company_nip := app.getNIP(r)
+	invoices, err := app.invoices.LastMonth(company_nip)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -232,7 +238,7 @@ func (app *application) addJpk(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	out = []byte(Header + string(out))
-	id, err := app.jpks.InsertDB(jpk, string(out))
+	id, err := app.jpks.InsertDB(jpk, string(out), company_nip)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -252,7 +258,8 @@ func (app *application) deleteJpk(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	err = app.jpks.Delete(id)
+	company_nip := app.getNIP(r)
+	err = app.jpks.Delete(id, company_nip)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -270,7 +277,8 @@ func (app *application) downloadJpk(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	fileContent, err := app.jpks.GetContent(id)
+	company_nip := app.getNIP(r)
+	fileContent, err := app.jpks.GetContent(id, company_nip)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			app.notFound(w)
@@ -288,6 +296,7 @@ func (app *application) downloadJpk(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) confirmJpk(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
+	company_nip := app.getNIP(r)
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
 		app.serverError(w, err)
@@ -303,7 +312,7 @@ func (app *application) confirmJpk(w http.ResponseWriter, r *http.Request) {
 	}
 	form.CheckField(validator.NotBlank(form.UPO), "upo", "UPO nie może być puste.")
 	if !form.Valid() {
-		jpk, metadata, err := app.jpks.Get(id)
+		jpk, metadata, err := app.jpks.Get(id, company_nip)
 		if err != nil {
 			app.serverError(w, err)
 			return
@@ -315,7 +324,7 @@ func (app *application) confirmJpk(w http.ResponseWriter, r *http.Request) {
 		app.render(w, http.StatusUnprocessableEntity, "view_jpk.tmpl", data)
 		return
 	}
-	err = app.jpks.Confirm(id, form.UPO)
+	err = app.jpks.Confirm(id, form.UPO, company_nip)
 
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
@@ -418,7 +427,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.users.Authenticate(form.Email, form.Password)
+	id, nip, err := app.users.Authenticate(form.Email, form.Password)
 
 	if err != nil {
 		if errors.Is(err, models.ErrInvalidCredentials) {
@@ -440,6 +449,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+	app.sessionManager.Put(r.Context(), "authenticatedUserNIP", nip)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -452,6 +462,7 @@ func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
+	app.sessionManager.Remove(r.Context(), "authenticatedUserNIP")
 	app.sessionManager.Put(r.Context(), "flash", "Wylogowano.")
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)

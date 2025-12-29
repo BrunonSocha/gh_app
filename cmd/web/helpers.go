@@ -60,3 +60,11 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 	}
 	return isAuthenticated
 }
+
+func (app *application) getNIP(r *http.Request) string {
+	nip, ok := r.Context().Value(nipContextKey).(string)
+	if !ok {
+		return ""
+	}
+	return nip
+}

@@ -33,7 +33,7 @@ func (m *UserModel) Insert(name, email, password, company, nip string) error {
 		}
 		return err
 	}
-	stmt := "INSERT INTO Users (name, email, hashed_password, nip, created) values (@p1, @p2, @p3, @p4, GETDATE())"
+	stmt := "INSERT INTO Users (name, email, hashed_password, company_nip, created) values (@p1, @p2, @p3, @p4, GETDATE())"
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
@@ -52,31 +52,32 @@ func (m *UserModel) Insert(name, email, password, company, nip string) error {
 	return nil
 }
 
-func (m *UserModel) Authenticate(email, password string) (int, error) {
+func (m *UserModel) Authenticate(email, password string) (int, string, error) {
 	var id int
 	var hashedPassword []byte
+	var company_nip string
 
-	stmt := "SELECT id, hashed_password FROM users WHERE email = @p1"
+	stmt := "SELECT id, hashed_password, company_nip FROM users WHERE email = @p1"
 
-	err := m.DB.QueryRow(stmt, email).Scan(&id, &hashedPassword)
+	err := m.DB.QueryRow(stmt, email).Scan(&id, &hashedPassword, &company_nip)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, ErrInvalidCredentials
+			return 0, "", ErrInvalidCredentials
 		} else {
-			return 0, err
+			return 0, "", err
 		}
 	}
 
 	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return 0, ErrInvalidCredentials
+			return 0, "", ErrInvalidCredentials
 		} else {
-			return 0, err
+			return 0, "", err
 		}
 	}
 
-	return id, err
+	return id, company_nip, err
 }
 
 func (m *UserModel) Exists(id int) (bool, error) {

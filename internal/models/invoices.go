@@ -28,21 +28,21 @@ const (
 	PurchaseInvoice InvoiceType = "PURC"
 )
 
-func (m *InvoiceModel) Insert(nip string, nr_faktury string, netto float64, podatek float64, data time.Time, inv_type InvoiceType, nazwa string) (int, error) {
-	stmt := "INSERT INTO Invoices (nip, nr_faktury, netto, podatek, data, type) OUTPUT Inserted.id VALUES (@p1, @p2, @p3, @p4, @p5, @p6)"
+func (m *InvoiceModel) Insert(nip string, nr_faktury string, netto float64, podatek float64, data time.Time, inv_type InvoiceType, nazwa string, company_nip string) (int, error) {
+	stmt := "INSERT INTO Invoices (nip, nr_faktury, netto, podatek, data, type) OUTPUT Inserted.id VALUES (@p1, @p2, @p3, @p4, @p5, @p6, @p7)"
 	m.DB.Exec("INSERT INTO Companies VALUES (@p1, @p2, 'PL')", nip, nazwa)
 	var resId int
-	err := m.DB.QueryRow(stmt, nip, nr_faktury, netto, podatek, data, inv_type).Scan(&resId)
+	err := m.DB.QueryRow(stmt, nip, nr_faktury, netto, podatek, data, inv_type, company_nip).Scan(&resId)
 	if err != nil {
 		return 0, err
 	}
 	return resId, nil
 }
 
-func (m *InvoiceModel) Get(id int) (*Invoice, string, error) {
-	stmt := "SELECT id, nip, nr_faktury, netto, podatek, data, type FROM Invoices WHERE id = @p1"
+func (m *InvoiceModel) Get(id int, company_nip string) (*Invoice, string, error) {
+	stmt := "SELECT id, nip, nr_faktury, netto, podatek, data, type FROM Invoices WHERE id = @p1 AND company_nip = @p2"
 	cStmt := "SELECT nazwa FROM Companies WHERE nip = @p1"
-	row := m.DB.QueryRow(stmt, id)
+	row := m.DB.QueryRow(stmt, id, company_nip)
 	inv := &Invoice{}
 	err := row.Scan(&inv.Id, &inv.Nip, &inv.Nr_faktury, &inv.Netto, &inv.Podatek, &inv.Data, &inv.Inv_type)
 	if err != nil {
@@ -62,9 +62,9 @@ func (m *InvoiceModel) Get(id int) (*Invoice, string, error) {
 
 }
 
-func (m *InvoiceModel) LastMonth() ([]*Invoice, error) {
-	stmt := "SELECT * FROM Invoices WHERE data >= DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 1, 0) AND data < DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0)"
-	rows, err := m.DB.Query(stmt)
+func (m *InvoiceModel) LastMonth(company_nip string) ([]*Invoice, error) {
+	stmt := "SELECT * FROM Invoices WHERE data >= DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 1, 0) AND data < DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0) AND company_nip = @p1"
+	rows, err := m.DB.Query(stmt, company_nip)
 	if err != nil {
 		return nil, err
 	}
@@ -85,9 +85,9 @@ func (m *InvoiceModel) LastMonth() ([]*Invoice, error) {
 	return invoices, err
 }
 
-func (m *InvoiceModel) GetAll() ([]*Invoice, error) {
-	stmt := "SELECT * FROM Invoices WHERE data < DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 1, 0) "
-	rows, err := m.DB.Query(stmt)
+func (m *InvoiceModel) GetAll(company_nip string) ([]*Invoice, error) {
+	stmt := "SELECT * FROM Invoices WHERE data < DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 1, 0) AND company_nip = @p1"
+	rows, err := m.DB.Query(stmt, company_nip)
 	if err != nil {
 		return nil, err
 	}
@@ -105,9 +105,9 @@ func (m *InvoiceModel) GetAll() ([]*Invoice, error) {
 	return invoices, nil
 }
 
-func (m *InvoiceModel) Delete(id int) error {
-	stmt := "DELETE FROM Invoices WHERE id = @p1"
-	row, err := m.DB.Exec(stmt, id)
+func (m *InvoiceModel) Delete(id int, company_nip string) error {
+	stmt := "DELETE FROM Invoices WHERE id = @p1 AND company_nip = @p2"
+	row, err := m.DB.Exec(stmt, id, company_nip)
 	if err != nil {
 		return err
 	}

@@ -86,3 +86,20 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 	})
 
 }
+
+
+func (app *application) requireNIP(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		nip := app.sessionManager.GetString(r.Context(), "authenticatedUserNIP")
+		if nip == "" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), nipContextKey, nip)
+		r = r.WithContext(ctx)
+
+		next.ServeHTTP(w, r)
+	})
+
+}

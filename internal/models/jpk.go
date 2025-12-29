@@ -261,20 +261,20 @@ func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
 	return jpk, nil
 }
 
-func (m *JPKModel) InsertDB(jpk *JPK, jpk_data string) (int, error) {
+func (m *JPKModel) InsertDB(jpk *JPK, jpk_data, company_nip string) (int, error) {
 	// implement insertion to DB after creation
-	stmt := "INSERT INTO JpkFiles(year, month, xml_content, generated_at) OUTPUT Inserted.id VALUES(@p1, @p2, @p3, @p4)"
+	stmt := "INSERT INTO JpkFiles(year, month, xml_content, generated_at, company_nip) OUTPUT Inserted.id VALUES(@p1, @p2, @p3, @p4, @p5)"
 	var resId int
-	err := m.DB.QueryRow(stmt, jpk.Naglowek.Rok, jpk.Naglowek.Miesiac, jpk_data, time.Now()).Scan(&resId)
+	err := m.DB.QueryRow(stmt, jpk.Naglowek.Rok, jpk.Naglowek.Miesiac, jpk_data, time.Now(), company_nip).Scan(&resId)
 	if err != nil {
 		return 0, err
 	}
 	return resId, nil
 }
 
-func (m *JPKModel) Get(id int) (*JPK, *JPKMetadata, error) {
-	stmt := "SELECT xml_content, id, generated_at, confirmed_at, upo_reference_number FROM JpkFiles WHERE id = @p1"
-	row := m.DB.QueryRow(stmt, id)
+func (m *JPKModel) Get(id int, company_nip string) (*JPK, *JPKMetadata, error) {
+	stmt := "SELECT xml_content, id, generated_at, confirmed_at, upo_reference_number FROM JpkFiles WHERE id = @p1 AND company_nip = @p2"
+	row := m.DB.QueryRow(stmt, id, company_nip)
 	var byteArray []byte
 	jpkmetadata := &JPKMetadata{}
 	err := row.Scan(&byteArray, &jpkmetadata.Id, &jpkmetadata.GeneratedAt, &jpkmetadata.ConfirmedAt, &jpkmetadata.UPO)
@@ -294,9 +294,9 @@ func (m *JPKModel) Get(id int) (*JPK, *JPKMetadata, error) {
 	return jpk, jpkmetadata, nil
 }
 
-func (m *JPKModel) GetAll() ([]*JPKMetadata, error) {
-	stmt := "SELECT id, confirmed_at, upo_reference_number, year, month FROM JpkFiles"
-	rows, err := m.DB.Query(stmt)
+func (m *JPKModel) GetAll(company_nip string) ([]*JPKMetadata, error) {
+	stmt := "SELECT id, confirmed_at, upo_reference_number, year, month FROM JpkFiles WHERE company_nip = @p1"
+	rows, err := m.DB.Query(stmt, company_nip)
 	if err != nil {
 		return nil, err
 	}
@@ -318,9 +318,9 @@ func (m *JPKModel) GetAll() ([]*JPKMetadata, error) {
 	return jpkfiles, nil
 }
 
-func (m *JPKModel) Confirm(id int, upo string) error {
-	stmt := "UPDATE JpkFiles SET confirmed_at = @p1, upo_reference_number = @p2 WHERE id = @p3"
-	rows, err := m.DB.Exec(stmt, time.Now(), upo, id)
+func (m *JPKModel) Confirm(id int, upo, company_nip string) error {
+	stmt := "UPDATE JpkFiles SET confirmed_at = @p1, upo_reference_number = @p2 WHERE id = @p3 AND company_nip = @p4"
+	rows, err := m.DB.Exec(stmt, time.Now(), upo, id, company_nip)
 	if err != nil {
 		return err
 	}
@@ -334,9 +334,9 @@ func (m *JPKModel) Confirm(id int, upo string) error {
 	return nil
 }
 
-func (m *JPKModel) Delete(id int) error {
-	stmt := "DELETE FROM JpkFiles WHERE id = @p1 AND confirmed_at IS NULL"
-	row, err := m.DB.Exec(stmt, id)
+func (m *JPKModel) Delete(id int, company_nip string) error {
+	stmt := "DELETE FROM JpkFiles WHERE id = @p1 AND confirmed_at IS NULL AND company_nip = @p2"
+	row, err := m.DB.Exec(stmt, id, company_nip)
 	if err != nil {
 		return err
 	}
@@ -351,8 +351,8 @@ func (m *JPKModel) Delete(id int) error {
 	return nil
 }
 
-func (m *JPKModel) GetContent(id int) ([]byte, error) {
-	stmt := "SELECT xml_content FROM JpkFiles WHERE id = @p1"
+func (m *JPKModel) GetContent(id int, company_nip string) ([]byte, error) {
+	stmt := "SELECT xml_content FROM JpkFiles WHERE id = @p1 AND company_nip = @p2"
 	var content []byte
 	err := m.DB.QueryRow(stmt, id).Scan(&content)
 	if err != nil {
