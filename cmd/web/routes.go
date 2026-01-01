@@ -24,6 +24,7 @@ func (app *application) routes() http.Handler {
 
 	// protected
 	router.Handler(http.MethodGet, "/", protected.ThenFunc(app.home))
+	router.Handler(http.MethodPost, "/", protected.ThenFunc(app.homePost))
 	router.Handler(http.MethodGet, "/addinvoice", protected.ThenFunc(app.addInvoice))
 	router.Handler(http.MethodPost, "/addinvoice", protected.ThenFunc(app.addInvoicePost))
 	router.Handler(http.MethodGet, "/viewinvoice/:id", protected.ThenFunc(app.viewInvoice))
@@ -31,7 +32,6 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodGet, "/jpk/view/:id", protected.ThenFunc(app.viewJpk))
 	router.Handler(http.MethodPost, "/jpk/delete/:id", protected.ThenFunc(app.deleteJpk))
 	router.Handler(http.MethodGet, "/jpk/viewall", protected.ThenFunc(app.viewAllJpk))
-	router.Handler(http.MethodGet, "/viewinvoices", protected.ThenFunc(app.viewAllInvoices))
 	router.Handler(http.MethodPost, "/deleteinvoice/:id", protected.ThenFunc(app.deleteInvoice))
 	router.Handler(http.MethodGet, "/jpk/download/:id", protected.ThenFunc(app.downloadJpk))
 	router.Handler(http.MethodPost, "/jpk/confirm/:id", protected.ThenFunc(app.confirmJpk))

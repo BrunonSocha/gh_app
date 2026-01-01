@@ -138,7 +138,7 @@ type ZakupCtrl struct {
 	PodatekNaliczony     float64 `xml:"PodatekNaliczony"`
 }
 
-func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
+func (m *JPKModel) NewJpk(inv []*Invoice, date time.Time) (*JPK, error) {
 	var podatekNaliczony float64 = 0
 	var podatekNalezny float64 = 0
 	var podstawaSprzedazy float64 = 0
@@ -147,10 +147,9 @@ func (m *JPKModel) NewJpk(inv []*Invoice) (*JPK, error) {
 	var zakupWiersz []ZakupWiersz
 	var companyName string
 	var poprzedniVat int
-	now := time.Now()
-	previousMonth := now.AddDate(0, -1, 0)
+	previousMonth := date.AddDate(0, -1, 0)
 	previousPeriod := previousMonth.AddDate(0, -1, 0)
-	err := m.DB.QueryRow("SELECT vat FROM JpkFiles WHERE year = @p1 AND month = @p2 AND confirmed_at IS NOT NULL", time.Now().Year(), previousPeriod.Month()).Scan(&poprzedniVat)
+	err := m.DB.QueryRow("SELECT vat FROM JpkFiles WHERE year = @p1 AND month = @p2 AND confirmed_at IS NOT NULL", date.Year(), previousPeriod.Month()).Scan(&poprzedniVat)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			poprzedniVat = 0

@@ -12,7 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-
+	"encoding/gob"
 	"app.greyhouse.es/internal/models"
 	"github.com/alexedwards/scs/mssqlstore"
 	"github.com/alexedwards/scs/v2"
@@ -32,6 +32,7 @@ type application struct {
 
 func main() {
 	// command line flag for the port
+	gob.Register(time.Time{})
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	dsn_str := fmt.Sprintf("sqlserver://sa:%s@localhost:1433?database=Greyhouse&trustServerCertificate=true", url.QueryEscape("DavidBowie11%"))
 	dsn := flag.String("dsn", dsn_str, "greyhouse-sql")

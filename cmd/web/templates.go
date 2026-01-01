@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"path/filepath"
+	"time"
 
 	"app.greyhouse.es/internal/models"
 )
@@ -19,6 +20,7 @@ type templateData struct {
 	Flash           string
 	IsAuthenticated bool
 	CSRFToken       string
+	CurrentDate time.Time
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

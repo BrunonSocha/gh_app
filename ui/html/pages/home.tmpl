@@ -1,7 +1,12 @@
 {{define "title"}}Aktualne{{end}}
 
 {{define "main"}}
-    <h2>Faktury z zeszłego miesiąca (do obecnego JPK):</h2>
+    <h2>Faktury:</h2>
+    <form action="/" method="POST" style="display:inline;">
+        <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
+        <input type="month" name="month" value='{{.CurrentDate.Format "2006-01"}}'>
+        <button type="submit" class="btn success">Zmień miesiąc</button>
+    </form>
     {{if .Invoices}}
     <form action="/jpk/create" method="POST" style="display:inline;">
     <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>

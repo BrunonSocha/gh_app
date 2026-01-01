@@ -62,9 +62,10 @@ func (m *InvoiceModel) Get(id int, company_nip string) (*Invoice, string, error)
 
 }
 
-func (m *InvoiceModel) LastMonth(company_nip string) ([]*Invoice, error) {
-	stmt := "SELECT * FROM Invoices WHERE data >= DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 1, 0) AND data < DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0) AND company_nip = @p1"
-	rows, err := m.DB.Query(stmt, company_nip)
+func (m *InvoiceModel) GetAll(company_nip string, current_date time.Time) ([]*Invoice, error) {
+	stmt := "SELECT * FROM Invoices WHERE data >= DATEFROMPARTS(@p1, @p2, 1) AND data < DATEADD(month, 1, DATEFROMPARTS(@p1, @p2, 1)) AND company_nip = @p3"
+	rows, err := m.DB.Query(stmt, current_date.Year(), int(current_date.Month()), company_nip)
+	// why the hell does time.Month() return a time object while time.Year() returns an int
 	if err != nil {
 		return nil, err
 	}
@@ -83,26 +84,6 @@ func (m *InvoiceModel) LastMonth(company_nip string) ([]*Invoice, error) {
 		return nil, err
 	}
 	return invoices, err
-}
-
-func (m *InvoiceModel) GetAll(company_nip string) ([]*Invoice, error) {
-	stmt := "SELECT * FROM Invoices WHERE data < DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 1, 0) AND company_nip = @p1"
-	rows, err := m.DB.Query(stmt, company_nip)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	invoices := []*Invoice{}
-	for rows.Next() {
-		inv := &Invoice{}
-		err := rows.Scan(&inv.Id, &inv.Nip, &inv.Nr_faktury, &inv.Netto, &inv.Podatek, &inv.Data, &inv.Inv_type, &inv.Company)
-		if err != nil {
-			return nil, err
-		}
-		invoices = append(invoices, inv)
-	}
-
-	return invoices, nil
 }
 
 func (m *InvoiceModel) Delete(id int, company_nip string) error {

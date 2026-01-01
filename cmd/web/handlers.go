@@ -49,14 +49,39 @@ type userLoginForm struct {
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	company_nip := app.getNIP(r)
-	invoices, err := app.invoices.LastMonth(company_nip)
+	data := app.newTemplateData(r)
+	invoices, err := app.invoices.GetAll(company_nip, data.CurrentDate)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-
-	data := app.newTemplateData(r)
 	data.Invoices = invoices
+	app.sessionManager.Put(r.Context(), "date", data.CurrentDate)
+	app.render(w, http.StatusOK, "home.tmpl", data)
+}
+
+func (app *application) homePost(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	dateStr := r.PostForm.Get("month")
+	date, err := time.Parse("2006-01", dateStr)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	company_nip := app.getNIP(r)
+	data := app.newTemplateData(r)
+	data.CurrentDate = date
+	invoices, err := app.invoices.GetAll(company_nip, data.CurrentDate)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	data.Invoices = invoices
+	app.sessionManager.Put(r.Context(), "date", data.CurrentDate)
 
 	app.render(w, http.StatusOK, "home.tmpl", data)
 }
@@ -158,17 +183,6 @@ func (app *application) viewInvoice(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "view_invoice.tmpl", data)
 }
 
-func (app *application) viewAllInvoices(w http.ResponseWriter, r *http.Request) {
-	company_nip := app.getNIP(r)
-	invoices, err := app.invoices.GetAll(company_nip)
-	if err != nil {
-		app.serverError(w, err)
-	}
-	data := app.newTemplateData(r)
-	data.Invoices = invoices
-	app.render(w, http.StatusOK, "view_invoices.tmpl", data)
-}
-
 func (app *application) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	company_nip := app.getNIP(r)
 	params := httprouter.ParamsFromContext(r.Context())
@@ -218,14 +232,18 @@ func (app *application) viewAllJpk(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) addJpk(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
 	company_nip := app.getNIP(r)
-	invoices, err := app.invoices.LastMonth(company_nip)
+	data := app.newTemplateData(r)
+	date, err := time.Parse("2006-01", params.ByName("date"))
+	data.CurrentDate = date
+	invoices, err := app.invoices.GetAll(company_nip, data.CurrentDate)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	jpk, err := app.jpks.NewJpk(invoices)
+	jpk, err := app.jpks.NewJpk(invoices, data.CurrentDate)
 
 	if err != nil {
 		app.serverError(w, err)
